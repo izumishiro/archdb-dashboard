@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>建築事例DB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────────── */
+:root {
+  --f: 'DM Sans','Noto Sans JP',sans-serif;
+  --r1:4px; --r2:8px; --r3:12px; --r4:16px; --rp:999px;
+  --ease:150ms cubic-bezier(.4,0,.2,1);
+  --cud:#EEEDFE; --fud:#3C3489;
+  --cbf:#E6F1FB; --fbf:#0C447C;
+  --cal:#EFEFEB; --fal:#444441;
+  --cfm:#FBEAF0; --ffm:#72243E;
+}
+[data-theme="light"] {
+  --bg:#EDECEA; --s0:#FFFFFF; --s1:#F4F3F0; --s2:#E6E4E0;
+  --s3:#CCCAC5; --s4:#AEACA6; --t1:#1A1916; --t2:#595750;
+  --t3:#9A9890; --t4:#C4C2BA; --hi:rgba(0,0,0,.04); --ac:rgba(0,0,0,.07);
+  --sh0:0 1px 2px rgba(0,0,0,.06); --sh1:0 2px 8px rgba(0,0,0,.09),0 1px 2px rgba(0,0,0,.05);
+  --sh2:0 6px 20px rgba(0,0,0,.11),0 2px 6px rgba(0,0,0,.06);
+  --acc:#8C8678; --acc-deep:#736D62; --acc-t:#FFFFFF;
+  --acc-sub:rgba(255,255,255,.55); --acc-line:rgba(255,255,255,.18);
+  --acc-hi:rgba(255,255,255,.10); --acc-act:rgba(255,255,255,.16);
+}
+[data-theme="dark"] {
+  --bg:#2A2A28; --s0:#343432; --s1:#3E3E3C; --s2:#484846;
+  --s3:#5E5E5A; --s4:#7E7E78; --t1:#F0EFE8; --t2:#AEADA6;
+  --t3:#767470; --t4:#4E4E4C; --hi:rgba(255,255,255,.05); --ac:rgba(255,255,255,.09);
+  --sh0:0 1px 2px rgba(0,0,0,.35); --sh1:0 2px 8px rgba(0,0,0,.4);
+  --sh2:0 6px 20px rgba(0,0,0,.48);
+  --acc:#585450; --acc-deep:#46433F; --acc-t:#F0EFE8;
+  --acc-sub:rgba(240,239,232,.5); --acc-line:rgba(255,255,255,.12);
+  --acc-hi:rgba(255,255,255,.07); --acc-act:rgba(255,255,255,.13);
+  --cud:#2E2B52; --fud:#AFA9EC; --cbf:#1A2E45; --fbf:#85B7EB;
+  --cal:#3E3E3C; --fal:#C8C7C0; --cfm:#3A1828; --ffm:#ED93B1;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+body{font-family:var(--f);background:var(--bg);color:var(--t1);height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased;transition:background var(--ease),color var(--ease)}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input{font-family:inherit;color:inherit}
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:208px;flex-shrink:0;background:var(--acc);border-right:1px solid var(--acc-deep);display:flex;flex-direction:column;transition:background var(--ease)}
+.sb-head{padding:20px 16px 16px;border-bottom:1px solid var(--acc-line)}
+.sb-org{font-size:9.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--acc-sub);margin-bottom:4px}
+.sb-title{font-size:15px;font-weight:500;color:var(--acc-t);letter-spacing:-.025em;line-height:1.2}
+.sb-title small{display:block;font-size:11px;font-weight:300;color:var(--acc-sub);letter-spacing:0;margin-top:2px}
+.nav-sec{font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--acc-sub);padding:16px 16px 4px;opacity:.7}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 16px;font-size:12.5px;color:var(--acc-sub);border-left:1.5px solid transparent;cursor:pointer;transition:background var(--ease),color var(--ease)}
+.nav-item svg{width:14px;height:14px;flex-shrink:0;stroke:currentColor;opacity:.7}
+.nav-item:hover{background:var(--acc-hi);color:var(--acc-t)}
+.nav-item.on{color:var(--acc-t);font-weight:500;border-left-color:var(--acc-t);background:var(--acc-act)}
+.nav-item.on svg{opacity:1}
+.nav-badge{margin-left:auto;font-size:9px;padding:1px 6px;border-radius:var(--rp);background:var(--acc-act);color:var(--acc-t);opacity:.8}
+.sb-foot{margin-top:auto;padding:12px 16px;border-top:1px solid var(--acc-line);display:flex;align-items:center;gap:9px}
+.ava{width:26px;height:26px;border-radius:50%;background:var(--acc-act);border:1px solid var(--acc-line);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--acc-t);flex-shrink:0}
+.sb-uname{font-size:11.5px;font-weight:500;color:var(--acc-t)}
+.sb-urole{font-size:10px;color:var(--acc-sub)}
+
+/* ── MAIN / TOPBAR ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:50px;flex-shrink:0;background:var(--acc);border-bottom:1px solid var(--acc-deep);display:flex;align-items:center;gap:8px;padding:0 18px;transition:background var(--ease)}
+.tb-title{font-size:13.5px;font-weight:500;color:var(--acc-t);flex:1;letter-spacing:-.015em}
+.tb-title span{font-weight:300;color:var(--acc-sub);font-size:11px;margin-left:9px;letter-spacing:0}
+.srch{display:flex;align-items:center;gap:6px;background:var(--acc-hi);border:1px solid var(--acc-line);border-radius:var(--rp);padding:0 11px;height:30px;width:214px;transition:border-color var(--ease)}
+.srch:focus-within{border-color:rgba(255,255,255,.4);box-shadow:0 0 0 3px var(--acc-act)}
+.srch svg{width:12px;height:12px;color:var(--acc-sub);flex-shrink:0;stroke:currentColor}
+.srch input{border:none;background:none;font-size:11.5px;color:var(--acc-t);width:100%;outline:none}
+.srch input::placeholder{color:var(--acc-sub)}
+.tw{display:flex;align-items:center;gap:5px}
+.tw svg{width:11px;height:11px;color:var(--acc-sub);stroke:currentColor}
+.tgl{width:40px;height:22px;border-radius:var(--rp);background:var(--acc-act);border:1px solid var(--acc-line);position:relative;cursor:pointer;flex-shrink:0;transition:background .22s}
+[data-theme="dark"] .tgl{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.18)}
+.tgl-k{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--acc-t);box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .22s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:center}
+[data-theme="dark"] .tgl-k{transform:translateX(18px)}
+.tgl-k svg{width:8px;height:8px}
+.ico-sun{display:block;color:#C08820}
+.ico-moon{display:none;color:#8070B8}
+[data-theme="dark"] .ico-sun{display:none}
+[data-theme="dark"] .ico-moon{display:block}
+.tbtn{height:30px;padding:0 13px;border-radius:var(--r2);font-size:11.5px;display:flex;align-items:center;gap:5px;transition:background var(--ease),opacity var(--ease)}
+.tbtn svg{width:11px;height:11px;stroke:currentColor}
+.tbtn:active{opacity:.75}
+.tbtn-g{background:var(--acc-hi);color:var(--acc-t);border:1px solid var(--acc-line)}
+.tbtn-g:hover{background:var(--acc-act)}
+.tbtn-s{background:var(--acc-t);color:var(--acc);font-weight:500;border:1px solid transparent}
+.tbtn-s:hover{opacity:.88}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{background:var(--s0);border:1px solid var(--s2);border-radius:var(--r3);padding:15px 16px;box-shadow:var(--sh0);transition:box-shadow var(--ease)}
+.stat:hover{box-shadow:var(--sh1)}
+.stat-lbl{font-size:10px;color:var(--t3);letter-spacing:.02em;margin-bottom:8px}
+.stat-num{font-size:30px;font-weight:300;color:var(--t1);line-height:1;letter-spacing:-.04em;font-family:'DM Sans',sans-serif}
+.stat-sub{font-size:10px;color:var(--t4);margin-top:6px}
+
+/* ── CONTROLS ── */
+.ctrl-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.vtabs{display:flex;gap:1px;background:var(--s1);border:1px solid var(--s2);border-radius:var(--r2);padding:2px}
+.vtab{display:flex;align-items:center;gap:4px;padding:4px 11px;font-size:11px;color:var(--t3);border-radius:calc(var(--r2) - 2px);cursor:pointer;transition:background var(--ease),color var(--ease)}
+.vtab svg{width:12px;height:12px;stroke:currentColor}
+.vtab.on{background:var(--s0);color:var(--t1);font-weight:500;box-shadow:var(--sh0)}
+.vtab:hover:not(.on){color:var(--t2)}
+.fchips{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.fc{padding:4px 11px;border-radius:var(--rp);font-size:11px;border:1px solid var(--s2);background:var(--s0);color:var(--t2);cursor:pointer;transition:all var(--ease)}
+.fc:hover{border-color:var(--s3);color:var(--t1)}
+.fc.on{background:var(--t1);color:var(--bg);border-color:var(--t1);font-weight:500}
+.sec-ct{font-size:10px;color:var(--t3);margin-left:auto}
+
+/* ── GALLERY ── */
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.gcard{background:var(--s0);border:1px solid var(--s2);border-radius:var(--r4);overflow:hidden;box-shadow:var(--sh0);cursor:pointer;transition:box-shadow var(--ease),transform var(--ease),border-color var(--ease)}
+.gcard:hover{box-shadow:var(--sh2);transform:translateY(-2px);border-color:var(--s3)}
+.gthumb{width:100%;aspect-ratio:16/9;background:var(--s2);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--s2)}
+.gph{display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--s4)}
+.gph svg{width:22px;height:22px;stroke:currentColor;opacity:.5}
+.gph span{font-size:9px;letter-spacing:.05em;text-transform:uppercase;opacity:.6}
+.gcnt{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.35);backdrop-filter:blur(6px);color:rgba(255,255,255,.85);font-size:9px;padding:2px 7px;border-radius:var(--rp);display:flex;align-items:center;gap:3px}
+.gcnt svg{width:9px;height:9px;stroke:currentColor}
+.gtags-ov{position:absolute;bottom:8px;left:8px;display:flex;gap:3px}
+.gbody{padding:11px 13px}
+.gname{font-size:12.5px;font-weight:500;color:var(--t1);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gmeta{font-size:10.5px;color:var(--t3);display:flex;align-items:center;gap:5px;margin-bottom:8px}
+.gmeta svg{width:10px;height:10px;stroke:currentColor;flex-shrink:0}
+.gtl{display:flex;flex-wrap:wrap;gap:3px}
+
+/* ── TAGS ── */
+.tag{font-size:9.5px;padding:2px 7px;border-radius:var(--rp);font-weight:500;white-space:nowrap}
+.tud{background:var(--cud);color:var(--fud)}
+.tbf{background:var(--cbf);color:var(--fbf)}
+.tal{background:var(--cal);color:var(--fal)}
+.tfm{background:var(--cfm);color:var(--ffm)}
+.tag-ov{font-size:8.5px;padding:2px 6px;border-radius:var(--rp);font-weight:500;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+
+/* ── TABLE ── */
+.twrap{background:var(--s0);border:1px solid var(--s2);border-radius:var(--r3);overflow:hidden;box-shadow:var(--sh0)}
+table{width:100%;border-collapse:collapse}
+th{background:var(--s1);padding:8px 12px;text-align:left;font-size:10px;font-weight:500;color:var(--t3);border-bottom:1px solid var(--s2);white-space:nowrap;letter-spacing:.04em;text-transform:uppercase}
+td{padding:9px 12px;font-size:11.5px;color:var(--t1);border-bottom:1px solid var(--s2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--hi)}
+.tn{font-weight:500}
+.tsb{font-size:10px;color:var(--t3);margin-top:1px}
+.thm{width:38px;height:28px;background:var(--s1);border-radius:var(--r1);border:1px solid var(--s2);display:flex;align-items:center;justify-content:center}
+.thm svg{width:13px;height:13px;stroke:currentColor;color:var(--s4)}
+.st{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--t3)}
+.sd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sd-ok{background:var(--s3)}
+.sd-ng{background:var(--s4)}
+
+/* ── 未登録表現 ── */
+.unknown{color:var(--t4);font-size:11px;font-style:italic}
+.gthumb.no-photo{background:repeating-linear-gradient(45deg,var(--s1),var(--s1) 4px,var(--s2) 4px,var(--s2) 8px)}
+
+/* ── LOADING / ERROR ── */
+.loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;gap:12px;color:var(--t3)}
+.loading-spinner{width:28px;height:28px;border:2px solid var(--s2);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-state{background:var(--s0);border:1px solid var(--s2);border-radius:var(--r3);padding:20px;text-align:center;color:var(--t3);font-size:12px}
+.error-state strong{display:block;color:var(--t2);margin-bottom:4px}
+
+/* ── API設定バナー ── */
+.api-banner{background:var(--acc);border:1px solid var(--acc-deep);border-radius:var(--r3);padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--sh1)}
+.api-banner-ico{width:32px;height:32px;border-radius:50%;background:var(--acc-act);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.api-banner-ico svg{width:15px;height:15px;stroke:var(--acc-t)}
+.api-banner-txt{flex:1}
+.api-banner-ttl{font-size:12px;font-weight:500;color:var(--acc-t);margin-bottom:2px}
+.api-banner-sub{font-size:10.5px;color:var(--acc-sub)}
+.api-banner-btn{height:28px;padding:0 14px;border-radius:var(--r2);background:var(--acc-t);color:var(--acc-deep);font-size:11px;font-weight:600;cursor:pointer;border:none;transition:opacity var(--ease);white-space:nowrap}
+.api-banner-btn:hover{opacity:.88}
+
+/* ── 設定モーダル ── */
+.cfg-modal{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .2s}
+.cfg-modal.open{opacity:1;pointer-events:auto}
+.cfg-box{background:var(--s0);border:1px solid var(--s2);border-radius:var(--r3);box-shadow:var(--sh2);width:520px;overflow:hidden}
+.cfg-head{background:var(--acc);padding:13px 16px;display:flex;align-items:center;gap:8px}
+.cfg-head span{font-size:13px;font-weight:500;color:#fff;flex:1}
+.cfg-body{padding:20px;display:flex;flex-direction:column;gap:16px}
+.cfg-field{display:flex;flex-direction:column;gap:5px}
+.cfg-lbl{font-size:10px;font-weight:500;color:var(--t3);letter-spacing:.04em;text-transform:uppercase}
+.cfg-input{height:36px;padding:0 11px;border:1px solid var(--s2);border-radius:var(--r2);background:var(--s1);color:var(--t1);font-size:12px;font-family:var(--f);outline:none;transition:border-color var(--ease)}
+.cfg-input:focus{border-color:var(--acc);background:var(--s0);box-shadow:0 0 0 3px rgba(140,134,120,.15)}
+.cfg-note{font-size:10.5px;color:var(--t3);line-height:1.6;background:var(--s1);border:1px solid var(--s2);border-radius:var(--r2);padding:10px 12px}
+.cfg-note code{font-family:monospace;font-size:10px;background:var(--s2);padding:1px 5px;border-radius:3px}
+.cfg-foot{padding:12px 20px;border-top:1px solid var(--s2);display:flex;gap:8px;justify-content:flex-end}
+.cfg-btn{height:32px;padding:0 16px;border-radius:var(--r2);font-size:11.5px;font-weight:500;cursor:pointer;border:none;transition:opacity var(--ease)}
+.cfg-btn:active{opacity:.75}
+.cfg-btn-cancel{background:var(--s1);color:var(--t2)}
+.cfg-btn-cancel:hover{background:var(--s2)}
+.cfg-btn-save{background:var(--acc);color:#fff}
+.cfg-btn-save:hover{opacity:.88}
+
+/* ── DETAIL PANEL ── */
+.detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.22);backdrop-filter:blur(2px);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s}
+.detail-overlay.open{opacity:1;pointer-events:auto}
+.detail-panel{position:fixed;top:0;right:0;bottom:0;width:480px;background:var(--s0);border-left:1px solid var(--s2);box-shadow:-4px 0 32px rgba(0,0,0,.12);display:flex;flex-direction:column;z-index:101;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);overflow:hidden}
+.detail-panel.open{transform:translateX(0)}
+.dp-head{background:var(--acc);padding:14px 16px 12px;flex-shrink:0;border-bottom:1px solid var(--acc-deep)}
+.dp-head-top{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.dp-close{width:26px;height:26px;border-radius:50%;background:var(--acc-act);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-left:auto;transition:background var(--ease)}
+.dp-close:hover{background:rgba(255,255,255,.25)}
+.dp-close svg{width:12px;height:12px;stroke:var(--acc-t);stroke-width:2.5}
+.dp-title{font-size:14px;font-weight:500;color:var(--acc-t);letter-spacing:-.02em}
+.dp-submeta{font-size:10.5px;color:var(--acc-sub);display:flex;align-items:center;gap:8px;margin-top:1px}
+.dp-submeta svg{width:10px;height:10px;stroke:currentColor;flex-shrink:0}
+.dp-body{flex:1;overflow-y:auto}
+.dp-body::-webkit-scrollbar{width:4px}
+.dp-body::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px}
+.dp-hero{width:100%;aspect-ratio:16/9;background:var(--s2);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--s2)}
+.dp-hero-ph{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--s4)}
+.dp-hero-ph svg{width:28px;height:28px;stroke:currentColor;opacity:.35}
+.dp-hero-ph span{font-size:9px;letter-spacing:.05em;text-transform:uppercase;opacity:.45}
+.dp-hero-cnt{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.38);backdrop-filter:blur(6px);color:rgba(255,255,255,.88);font-size:9px;padding:3px 9px;border-radius:var(--rp);display:flex;align-items:center;gap:4px}
+.dp-hero-cnt svg{width:9px;height:9px;stroke:currentColor}
+.dp-sec{padding:14px 16px;border-bottom:1px solid var(--s2)}
+.dp-sec:last-child{border-bottom:none;padding-bottom:20px}
+.dp-sec-ttl{font-size:9.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
+.dp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}
+.dp-fw{grid-column:1/-1}
+.dp-lbl{font-size:9.5px;color:var(--t3);margin-bottom:2px;letter-spacing:.02em}
+.dp-val{font-size:12px;color:var(--t1);line-height:1.4}
+.dp-tags{display:flex;flex-wrap:wrap;gap:4px}
+.dp-foot{flex-shrink:0;padding:11px 16px;border-top:1px solid var(--s2);display:flex;align-items:center;gap:8px;background:var(--s0)}
+.dp-btn{flex:1;height:32px;border-radius:var(--r2);font-size:11.5px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:5px;transition:opacity var(--ease),background var(--ease);cursor:pointer}
+.dp-btn:active{opacity:.75}
+.dp-btn svg{width:12px;height:12px;stroke:currentColor;stroke-width:2}
+.dp-btn-pri{background:var(--acc);color:var(--acc-t);border:1px solid var(--acc-deep)}
+.dp-btn-pri:hover{opacity:.88}
+.dp-btn-sec{background:var(--s1);color:var(--t2);border:1px solid var(--s2)}
+.dp-btn-sec:hover{background:var(--s2);color:var(--t1)}
+
+/* ── ANIM ── */
+@keyframes up{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.stat{animation:up .25s ease both}
+.stat:nth-child(1){animation-delay:.03s}
+.stat:nth-child(2){animation-delay:.07s}
+.stat:nth-child(3){animation-delay:.11s}
+.stat:nth-child(4){animation-delay:.15s}
+#vtbl{display:none}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="sb-head">
+    <div class="sb-org">建築技術課</div>
+    <div class="sb-title">建築事例 DB<small>公共施設調査記録</small></div>
+  </div>
+  <div class="nav-sec">メイン</div>
+  <div class="nav-item on">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    ダッシュボード <span class="nav-badge" id="nbTotal">—</span>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+    公共トイレ
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    建築物（拡張予定）
+  </div>
+  <div class="nav-sec">管理</div>
+  <div class="nav-item" onclick="openConfig()">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+    SharePoint接続設定
+  </div>
+  <div class="sb-foot">
+    <div class="ava" id="sbAva">—</div>
+    <div>
+      <div class="sb-uname" id="sbName">読込中…</div>
+      <div class="sb-urole">建築技術課</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+  <header class="topbar">
+    <div class="tb-title">ダッシュボード <span>建築事例</span></div>
+    <div class="srch">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="施設名・住所で検索…" oninput="filterCards()">
+    </div>
+    <div class="tw">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <div class="tgl" onclick="toggleTheme()"><div class="tgl-k"><svg class="ico-sun" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg><svg class="ico-moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></div></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    </div>
+    <button class="tbtn tbtn-g" onclick="loadData()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.64"/></svg>
+      更新
+    </button>
+  </header>
+
+  <div class="content">
+
+    <!-- API未設定バナー（初回のみ表示） -->
+    <div class="api-banner" id="apiBanner" style="display:none">
+      <div class="api-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+      <div class="api-banner-txt">
+        <div class="api-banner-ttl">SharePoint接続の設定が必要です</div>
+        <div class="api-banner-sub">テナントURLとサイトアドレスを設定するとリアルタイムでデータが表示されます</div>
+      </div>
+      <button class="api-banner-btn" onclick="openConfig()">設定する</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat"><div class="stat-lbl">総登録件数</div><div class="stat-num" id="stTotal">—</div><div class="stat-sub" id="stSub">読込中…</div></div>
+      <div class="stat"><div class="stat-lbl">だれでもトイレ</div><div class="stat-num" id="stDaremo">—</div><div class="stat-sub">登録件数</div></div>
+      <div class="stat"><div class="stat-lbl">BF対応</div><div class="stat-num" id="stBF">—</div><div class="stat-sub">登録件数</div></div>
+      <div class="stat"><div class="stat-lbl">調査済</div><div class="stat-num" id="stSurveyed">—</div><div class="stat-sub">ステータス確認済</div></div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="ctrl-row">
+      <div class="vtabs">
+        <div class="vtab on" id="tg" onclick="sv('g')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          ギャラリー
+        </div>
+        <div class="vtab" id="tt" onclick="sv('t')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          リスト
+        </div>
+      </div>
+      <div class="fchips" id="filterChips">
+        <div class="fc on" onclick="setFilter(this,'all')">すべて</div>
+        <div class="fc" onclick="setFilter(this,'ud')">UD</div>
+        <div class="fc" onclick="setFilter(this,'bf')">BF</div>
+        <div class="fc" onclick="setFilter(this,'daremo')">だれでも</div>
+        <div class="fc" onclick="setFilter(this,'oyako')">親子</div>
+        <div class="fc" onclick="setFilter(this,'ostomy')">オストメイト</div>
+        <div class="fc" onclick="setFilter(this,'lgbtq')">LGBTQ</div>
+      </div>
+      <div class="sec-ct" id="dispCount">— 件</div>
+    </div>
+
+    <!-- GALLERY -->
+    <div class="gallery" id="vg">
+      <div class="loading-state" style="grid-column:1/-1">
+        <div class="loading-spinner"></div>
+        <span>データを読込中…</span>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div id="vtbl">
+      <div class="twrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:46px">—</th>
+              <th>施設名</th>
+              <th>住所</th>
+              <th>用途</th>
+              <th>竣工年</th>
+              <th>調査日</th>
+              <th>状態</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="7" style="text-align:center;color:var(--t3);padding:24px">読込中…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /main -->
+
+<!-- ═══ 接続設定モーダル ═══ -->
+<div class="cfg-modal" id="cfgModal" onclick="if(event.target===this)closeConfig()">
+  <div class="cfg-box">
+    <div class="cfg-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:15px;height:15px;flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+      <span>SharePoint 接続設定</span>
+      <button onclick="closeConfig()" style="margin-left:auto;background:var(--acc-act);color:#fff;height:24px;padding:0 10px;border-radius:var(--r2);font-size:11px;cursor:pointer;border:none">閉じる</button>
+    </div>
+    <div class="cfg-body">
+      <div class="cfg-note">
+        <strong style="font-size:11px;color:var(--t2);display:block;margin-bottom:4px">接続手順</strong>
+        ① このファイルを <code>SharePointサイト > サイトページ</code> に配置するか、同一テナントのブラウザで開いてください。<br>
+        ② 下記URLを入力して「保存・接続」をクリックします。<br>
+        ③ 初回のみMicrosoftアカウントへのサインインが求められます。<br><br>
+        <strong style="font-size:11px;color:var(--t2)">サイトURL（固定）</strong><br>
+        <code>https://cnexcohet.sharepoint.com/teams/msteams_b31c0b</code>
+      </div>
+      <div class="cfg-field">
+        <div class="cfg-lbl">SharePoint サイトURL</div>
+        <input class="cfg-input" id="cfgSiteUrl" type="text" placeholder="https://cnexcohet.sharepoint.com/teams/msteams_b31c0b" value="https://cnexcohet.sharepoint.com/teams/msteams_b31c0b">
+      </div>
+      <div class="cfg-field">
+        <div class="cfg-lbl">建築物情報 リスト名</div>
+        <input class="cfg-input" id="cfgList1" type="text" placeholder="建築物情報" value="建築物情報">
+      </div>
+      <div class="cfg-field">
+        <div class="cfg-lbl">BF・UD分類 リスト名</div>
+        <input class="cfg-input" id="cfgList2" type="text" placeholder="BF・UD分類" value="BF・UD分類">
+      </div>
+      <div class="cfg-field">
+        <div class="cfg-lbl">調査情報 リスト名</div>
+        <input class="cfg-input" id="cfgList3" type="text" placeholder="調査情報" value="調査情報">
+      </div>
+    </div>
+    <div class="cfg-foot">
+      <button class="cfg-btn cfg-btn-cancel" onclick="closeConfig()">キャンセル</button>
+      <button class="cfg-btn cfg-btn-save" onclick="saveConfig()">保存・接続</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DETAIL PANEL ═══ -->
+<div class="detail-overlay" id="overlay" onclick="closeDetail()"></div>
+<div class="detail-panel" id="detailPanel">
+  <div class="dp-head">
+    <div class="dp-head-top">
+      <div class="dp-title" id="dp-title">—</div>
+      <button class="dp-close" onclick="closeDetail()"><svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="dp-submeta">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span id="dp-addr">—</span>
+      <span style="opacity:.4">|</span>
+      <span id="dp-code">—</span>
+    </div>
+  </div>
+  <div class="dp-body">
+    <div class="dp-hero">
+      <div class="dp-hero-ph">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span>サムネ写真</span>
+      </div>
+      <div class="dp-hero-cnt" id="dp-photocnt">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>
+        0枚
+      </div>
+    </div>
+    <div class="dp-sec">
+      <div class="dp-sec-ttl">建築物情報</div>
+      <div class="dp-grid">
+        <div class="dp-fw"><div class="dp-lbl">施設名称</div><div class="dp-val" id="dp-name">—</div></div>
+        <div><div class="dp-lbl">用途</div><div class="dp-val" id="dp-use">—</div></div>
+        <div><div class="dp-lbl">竣工年</div><div class="dp-val" id="dp-year">—</div></div>
+        <div><div class="dp-lbl">設計者</div><div class="dp-val" id="dp-arch">—</div></div>
+        <div><div class="dp-lbl">施工者</div><div class="dp-val" id="dp-cont">—</div></div>
+      </div>
+    </div>
+    <div class="dp-sec">
+      <div class="dp-sec-ttl">BF・UD 分類</div>
+      <div class="dp-tags" id="dp-tags">—</div>
+    </div>
+    <div class="dp-sec">
+      <div class="dp-sec-ttl">調査情報</div>
+      <div class="dp-grid">
+        <div><div class="dp-lbl">調査日</div><div class="dp-val" id="dp-survey-date">—</div></div>
+        <div><div class="dp-lbl">ステータス</div><div class="dp-val" id="dp-status">—</div></div>
+        <div><div class="dp-lbl">写真枚数</div><div class="dp-val" id="dp-photo-count">—</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="dp-foot">
+    <button class="dp-btn dp-btn-sec" onclick="closeDetail()">
+      <svg viewBox="0 0 24 24" fill="none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      閉じる
+    </button>
+    <button class="dp-btn dp-btn-sec" id="dp-sp-link">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      SPで開く
+    </button>
+    <button class="dp-btn dp-btn-pri" id="dp-box-link">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      Boxで写真確認
+    </button>
+  </div>
+</div>
+
+</div><!-- /shell -->
+
+<script>
+/* ══════════════════════════════════════════
+   設定管理
+══════════════════════════════════════════ */
+const STORAGE_KEY = 'archdb_sp_config';
+
+function getConfig() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) return JSON.parse(saved);
+  return {
+    siteUrl: 'https://cnexcohet.sharepoint.com/teams/msteams_b31c0b',
+    list1: '建築物情報',
+    list2: 'BF・UD分類',
+    list3: '調査情報'
+  };
+}
+
+function saveConfig() {
+  const cfg = {
+    siteUrl: document.getElementById('cfgSiteUrl').value.trim().replace(/\/$/, ''),
+    list1: document.getElementById('cfgList1').value.trim(),
+    list2: document.getElementById('cfgList2').value.trim(),
+    list3: document.getElementById('cfgList3').value.trim()
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg));
+  closeConfig();
+  document.getElementById('apiBanner').style.display = 'none';
+  loadData();
+}
+
+function openConfig() {
+  const cfg = getConfig();
+  document.getElementById('cfgSiteUrl').value = cfg.siteUrl;
+  document.getElementById('cfgList1').value = cfg.list1;
+  document.getElementById('cfgList2').value = cfg.list2;
+  document.getElementById('cfgList3').value = cfg.list3;
+  document.getElementById('cfgModal').classList.add('open');
+}
+function closeConfig() {
+  document.getElementById('cfgModal').classList.remove('open');
+}
+
+/* ══════════════════════════════════════════
+   SharePoint REST API 呼び出し
+══════════════════════════════════════════ */
+const TAG_MAP = {
+  TagUD: {label:'UD対応', cls:'tud'},
+  TagBF: {label:'BF対応', cls:'tbf'},
+  TagDaremo: {label:'だれでもトイレ', cls:'tal'},
+  TagOyako: {label:'親子トイレ', cls:'tfm'},
+  TagOstomy: {label:'オストメイト', cls:'tal'},
+  TagLGBTQ: {label:'LGBTQ配慮', cls:'tud'},
+};
+
+// グローバルデータストア
+let DB = { facilities: [], bfud: {}, survey: {} };
+let filteredData = [];
+let currentFilter = 'all';
+
+async function spFetch(url) {
+  const res = await fetch(url, {
+    headers: { 'Accept': 'application/json;odata=nometadata' },
+    credentials: 'include'
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${url}`);
+  return res.json();
+}
+
+async function loadData() {
+  const cfg = getConfig();
+  const gallery = document.getElementById('vg');
+  const tableBody = document.getElementById('tableBody');
+
+  gallery.innerHTML = `<div class="loading-state" style="grid-column:1/-1"><div class="loading-spinner"></div><span>SharePointからデータを取得中…</span></div>`;
+
+  try {
+    const base = `${cfg.siteUrl}/_api/web/lists/getbytitle`;
+
+    // 3リストを並列取得
+    const [facRes, bfRes, svRes] = await Promise.all([
+      spFetch(`${base}('${encodeURIComponent(cfg.list1)}')/items?$select=Title,FacilityName,UseType,Address,CompletionDate,Architect,Contractor&$orderby=Title asc&$top=200`),
+      spFetch(`${base}('${encodeURIComponent(cfg.list2)}')/items?$select=Title,TagUD,TagBF,TagDaremo,TagOyako,TagOstomy,TagLGBTQ,TagCustom&$top=200`),
+      spFetch(`${base}('${encodeURIComponent(cfg.list3)}')/items?$select=Title,SurveyDate,Status,PhotoCount&$top=200`)
+    ]);
+
+    // BF・UD分類をTitleキーでマップ化
+    DB.bfud = {};
+    (bfRes.value || []).forEach(r => { DB.bfud[r.Title] = r; });
+
+    // 調査情報をTitleキーでマップ化
+    DB.survey = {};
+    (svRes.value || []).forEach(r => { DB.survey[r.Title] = r; });
+
+    DB.facilities = facRes.value || [];
+
+    // 統計
+    const total = DB.facilities.length;
+    const daremo = DB.facilities.filter(f => DB.bfud[f.Title]?.TagDaremo).length;
+    const bf = DB.facilities.filter(f => DB.bfud[f.Title]?.TagBF).length;
+    const surveyed = DB.facilities.filter(f => DB.survey[f.Title]?.Status === '調査済').length;
+
+    document.getElementById('stTotal').textContent = total;
+    document.getElementById('stDaremo').textContent = daremo;
+    document.getElementById('stBF').textContent = bf;
+    document.getElementById('stSurveyed').textContent = surveyed;
+    document.getElementById('stSub').textContent = `登録件数`;
+    document.getElementById('nbTotal').textContent = total;
+
+    // フィルタ適用して描画
+    applyFilter();
+
+    // ユーザー情報（ベストエフォート）
+    try {
+      const user = await spFetch(`${cfg.siteUrl}/_api/web/currentuser?$select=Title`);
+      const name = user.Title || '';
+      document.getElementById('sbName').textContent = name;
+      document.getElementById('sbAva').textContent = name.slice(0,2) || '—';
+    } catch(_) {}
+
+  } catch(err) {
+    console.error(err);
+    gallery.innerHTML = `
+      <div class="error-state" style="grid-column:1/-1">
+        <strong>SharePointへの接続に失敗しました</strong>
+        ${err.message}<br><br>
+        同一テナントのブラウザで開いているか、URLが正しいか確認してください。<br>
+        <button onclick="openConfig()" style="margin-top:10px;padding:6px 14px;border-radius:6px;background:var(--acc);color:#fff;border:none;cursor:pointer;font-size:11px">接続設定を確認</button>
+      </div>`;
+    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:24px">接続エラー</td></tr>`;
+  }
+}
+
+/* ══════════════════════════════════════════
+   フィルタ・描画
+══════════════════════════════════════════ */
+function setFilter(el, key) {
+  document.querySelectorAll('.fc').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  currentFilter = key;
+  applyFilter();
+}
+
+function applyFilter() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  filteredData = DB.facilities.filter(f => {
+    // テキスト検索
+    if (q && !`${f.FacilityName||''} ${f.Address||''} ${f.Title}`.toLowerCase().includes(q)) return false;
+    // タグフィルタ
+    if (currentFilter === 'all') return true;
+    const bf = DB.bfud[f.Title];
+    if (!bf) return false;
+    const map = { ud:'TagUD', bf:'TagBF', daremo:'TagDaremo', oyako:'TagOyako', ostomy:'TagOstomy', lgbtq:'TagLGBTQ' };
+    return !!bf[map[currentFilter]];
+  });
+
+  document.getElementById('dispCount').textContent = `${filteredData.length} 件`;
+  renderGallery();
+  renderTable();
+}
+
+function filterCards() { applyFilter(); }
+
+function buildTags(code) {
+  const bf = DB.bfud[code];
+  if (!bf) return '';
+  return Object.entries(TAG_MAP)
+    .filter(([k]) => bf[k])
+    .map(([,v]) => `<span class="tag ${v.cls}">${v.label}</span>`)
+    .join('');
+}
+
+function buildTagsOverlay(code) {
+  const bf = DB.bfud[code];
+  if (!bf) return '';
+  return Object.entries(TAG_MAP)
+    .filter(([k]) => bf[k])
+    .slice(0, 2)
+    .map(([,v]) => `<span class="tag ${v.cls} tag-ov">${v.label}</span>`)
+    .join('');
+}
+
+function fmtDate(d) {
+  if (!d) return null;
+  return d.slice(0, 10).replace(/-/g, '/');
+}
+
+function renderGallery() {
+  const gallery = document.getElementById('vg');
+  if (!filteredData.length) {
+    gallery.innerHTML = `<div class="error-state" style="grid-column:1/-1"><strong>該当する施設がありません</strong>検索条件またはフィルタを変更してください</div>`;
+    return;
+  }
+  gallery.innerHTML = filteredData.map(f => {
+    const sv = DB.survey[f.Title] || {};
+    const photoCnt = sv.PhotoCount || 0;
+    const hasPhoto = photoCnt > 0;
+    const tagsOv = buildTagsOverlay(f.Title);
+    const tags = buildTags(f.Title);
+    const year = f.CompletionDate || null;
+    const metaYear = year ? `${year}年竣工` : `<span class="unknown">竣工年不明</span>`;
+    const addr = f.Address || '';
+
+    return `
+    <div class="gcard" onclick="openDetail('${escHtml(f.Title)}')">
+      <div class="gthumb${hasPhoto ? '' : ' no-photo'}">
+        <div class="gph">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span>${hasPhoto ? 'サムネ写真' : '写真未登録'}</span>
+        </div>
+        <div class="gcnt">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>${photoCnt}
+        </div>
+        ${tagsOv ? `<div class="gtags-ov">${tagsOv}</div>` : ''}
+      </div>
+      <div class="gbody">
+        <div class="gname">${escHtml(f.FacilityName || f.Title)}</div>
+        <div class="gmeta">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          ${escHtml(addr)} · ${metaYear}
+        </div>
+        <div class="gtl">${tags || '<span class="unknown" style="font-size:10px">タグ未登録</span>'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  if (!filteredData.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:24px">該当なし</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filteredData.map(f => {
+    const sv = DB.survey[f.Title] || {};
+    const statusOk = sv.Status === '調査済';
+    const tags = buildTags(f.Title);
+    return `
+    <tr onclick="openDetail('${escHtml(f.Title)}')">
+      <td><div class="thm"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div></td>
+      <td><div class="tn">${escHtml(f.FacilityName || f.Title)}</div><div class="tsb">${escHtml(f.Title)}</div></td>
+      <td style="color:var(--t3);font-size:11px">${escHtml(f.Address || '')}</td>
+      <td>${tags || '—'}</td>
+      <td style="font-size:11px;color:var(--t3)">${f.CompletionDate || '<span class="unknown">不明</span>'}</td>
+      <td style="font-size:11px;color:var(--t3)">${fmtDate(sv.SurveyDate) || '—'}</td>
+      <td><div class="st"><span class="sd ${statusOk ? 'sd-ok' : 'sd-ng'}"></span>${escHtml(sv.Status || '未設定')}</div></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   詳細パネル
+══════════════════════════════════════════ */
+function openDetail(code) {
+  const f = DB.facilities.find(x => x.Title === code);
+  if (!f) return;
+  const bf = DB.bfud[code] || {};
+  const sv = DB.survey[code] || {};
+  const cfg = getConfig();
+
+  document.getElementById('dp-title').textContent = f.FacilityName || f.Title;
+  document.getElementById('dp-addr').textContent = f.Address || '住所未登録';
+  document.getElementById('dp-code').textContent = `施設コード：${f.Title}`;
+  document.getElementById('dp-name').textContent = f.FacilityName || '—';
+  document.getElementById('dp-use').textContent = f.UseType || '—';
+  document.getElementById('dp-year').textContent = f.CompletionDate || '不明';
+  document.getElementById('dp-arch').textContent = f.Architect || '—';
+  document.getElementById('dp-cont').textContent = f.Contractor || '—';
+  document.getElementById('dp-survey-date').textContent = fmtDate(sv.SurveyDate) || '—';
+  document.getElementById('dp-status').textContent = sv.Status || '—';
+  document.getElementById('dp-photo-count').textContent = sv.PhotoCount != null ? `${sv.PhotoCount}枚` : '—';
+  document.getElementById('dp-photocnt').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>${sv.PhotoCount || 0}枚`;
+
+  // タグ
+  const tagHtml = Object.entries(TAG_MAP)
+    .filter(([k]) => bf[k])
+    .map(([,v]) => `<span class="tag ${v.cls}">${v.label}</span>`)
+    .join('');
+  document.getElementById('dp-tags').innerHTML = tagHtml || '<span class="unknown">タグ未登録</span>';
+
+  // SharePoint & Box リンク
+  document.getElementById('dp-sp-link').onclick = () => {
+    window.open(`${cfg.siteUrl}/Lists/${encodeURIComponent(cfg.list1)}`, '_blank');
+  };
+  document.getElementById('dp-box-link').onclick = () => {
+    window.open('https://app.box.com', '_blank');
+  };
+
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('detailPanel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDetail() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('detailPanel').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ══════════════════════════════════════════
+   ユーティリティ
+══════════════════════════════════════════ */
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function sv(v) {
+  document.getElementById('vg').style.display = v === 'g' ? 'grid' : 'none';
+  document.getElementById('vtbl').style.display = v === 't' ? 'block' : 'none';
+  document.getElementById('tg').className = 'vtab' + (v === 'g' ? ' on' : '');
+  document.getElementById('tt').className = 'vtab' + (v === 't' ? ' on' : '');
+}
+
+function toggleTheme() {
+  const h = document.documentElement;
+  h.setAttribute('data-theme', h.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+  localStorage.setItem('theme', h.getAttribute('data-theme'));
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeDetail(); closeConfig(); }
+});
+
+/* ══════════════════════════════════════════
+   初期化
+══════════════════════════════════════════ */
+(function init() {
+  const saved = localStorage.getItem('theme');
+  const preferred = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', saved || preferred);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!localStorage.getItem('theme')) {
+      document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+    }
+  });
+
+  // 設定済みかどうかチェック
+  if (!localStorage.getItem(STORAGE_KEY)) {
+    document.getElementById('apiBanner').style.display = 'flex';
+  }
+
+  // データ自動読込
+  loadData();
+})();
+</script>
+</body>
+</html>
