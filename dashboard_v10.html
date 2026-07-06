@@ -164,6 +164,7 @@ tr:hover td{background:var(--hi)}
 /* ── 未登録表現 ── */
 .unknown{color:var(--t4);font-size:11px;font-style:italic}
 .gthumb.no-photo{background:repeating-linear-gradient(45deg,var(--s1),var(--s1) 4px,var(--s2) 4px,var(--s2) 8px)}
+.gthumb.has-img .gph,.dp-hero.has-img .dp-hero-ph{display:none}
 
 /* ── LOADING / ERROR ── */
 .loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;gap:12px;color:var(--t3)}
@@ -638,6 +639,57 @@ async function fetchDbJson() {
 }
 
 /* ══════════════════════════════════════════
+   サムネイル取得（Box thumbnail API）
+══════════════════════════════════════════ */
+const thumbCache = new Map(); // Title -> blobURL | null(失敗) | undefined(未試行)
+const IMG_EXT = /\.(jpe?g|png|heic|heif|webp)$/i;
+
+async function findImageFileInFolder(folderId) {
+  const res = await boxFetch(`https://api.box.com/2.0/folders/${folderId}/items?fields=id,name,type&limit=1000`);
+  const j = await res.json();
+  const files = (j.entries || []).filter(e => e.type === 'file' && IMG_EXT.test(e.name));
+  if (!files.length) return null;
+  // ファイル名に「サムネ」「thumb」を含むものを優先、なければ名前順の先頭
+  files.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+  const preferred = files.find(f => /サムネ|thumb/i.test(f.name));
+  return (preferred || files[0]).id;
+}
+
+async function getThumbUrl(f) {
+  if (thumbCache.has(f.Title)) return thumbCache.get(f.Title);
+  if (!f.boxFolderId) { thumbCache.set(f.Title, null); return null; }
+  try {
+    const fileId = await findImageFileInFolder(f.boxFolderId);
+    if (!fileId) { thumbCache.set(f.Title, null); return null; }
+    const res = await boxFetch(`https://api.box.com/2.0/files/${fileId}/thumbnail.png?min_height=320&min_width=320`);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    thumbCache.set(f.Title, url);
+    return url;
+  } catch(e) {
+    console.warn('サムネ取得失敗', f.Title, e.message);
+    thumbCache.set(f.Title, null);
+    return null;
+  }
+}
+
+// 表示中のカードに非同期でサムネを反映（一覧描画をブロックしない）
+function hydrateThumbs(list) {
+  list.forEach(f => {
+    if (!f.boxFolderId || thumbCache.has(f.Title)) return;
+    getThumbUrl(f).then(url => {
+      if (!url) return;
+      document.querySelectorAll(`[data-thumb-for="${CSS.escape(f.Title)}"]`).forEach(el => {
+        el.style.backgroundImage = `url("${url}")`;
+        el.style.backgroundSize = 'cover';
+        el.style.backgroundPosition = 'center';
+        el.classList.add('has-img');
+      });
+    });
+  });
+}
+
+/* ══════════════════════════════════════════
    データ整形・描画
 ══════════════════════════════════════════ */
 const TAG_MAP = {
@@ -797,7 +849,7 @@ function renderGallery() {
 
     return `
     <div class="gcard" onclick="openDetail('${escHtml(f.Title)}')">
-      <div class="gthumb${hasPhoto ? '' : ' no-photo'}">
+      <div class="gthumb${hasPhoto ? '' : ' no-photo'}" data-thumb-for="${escHtml(f.Title)}">
         <div class="gph">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
           <span>${hasPhoto ? 'サムネ写真' : '写真未登録'}</span>
@@ -817,6 +869,7 @@ function renderGallery() {
       </div>
     </div>`;
   }).join('');
+  hydrateThumbs(filteredData);
 }
 
 function renderTable() {
@@ -863,6 +916,27 @@ function openDetail(code) {
   document.getElementById('dp-status').textContent = sv.Status || '—';
   document.getElementById('dp-photo-count').textContent = sv.PhotoCount != null ? `${sv.PhotoCount}枚` : '—';
   document.getElementById('dp-photocnt').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>${sv.PhotoCount || 0}枚`;
+
+  // サムネ（キャッシュ済みなら即反映、未取得ならギャラリー側の非同期取得を待つ）
+  const heroEl = document.querySelector('.dp-hero');
+  heroEl.style.backgroundImage = '';
+  heroEl.classList.remove('has-img');
+  const cached = thumbCache.get(f.Title);
+  if (cached) {
+    heroEl.style.backgroundImage = `url("${cached}")`;
+    heroEl.style.backgroundSize = 'cover';
+    heroEl.style.backgroundPosition = 'center';
+    heroEl.classList.add('has-img');
+  } else if (f.boxFolderId) {
+    getThumbUrl(f).then(url => {
+      if (url && document.getElementById('detailPanel').classList.contains('open') && document.getElementById('dp-code').textContent.includes(f.Title)) {
+        heroEl.style.backgroundImage = `url("${url}")`;
+        heroEl.style.backgroundSize = 'cover';
+        heroEl.style.backgroundPosition = 'center';
+        heroEl.classList.add('has-img');
+      }
+    });
+  }
 
   // タグ
   const tagHtml = Object.entries(TAG_MAP)
