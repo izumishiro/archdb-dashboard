@@ -661,7 +661,7 @@ async function getThumbUrl(f) {
   try {
     const fileId = await findImageFileInFolder(f.boxFolderId);
     if (!fileId) { thumbCache.set(f.Title, null); return null; }
-    const res = await boxFetch(`https://api.box.com/2.0/files/${fileId}/thumbnail.png?min_height=320&min_width=320`);
+    const res = await boxFetch(`https://api.box.com/2.0/files/${fileId}/content`);
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     thumbCache.set(f.Title, url);
