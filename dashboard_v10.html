@@ -954,18 +954,15 @@ function buildTags(code) {
     .join('');
 }
 
-// 便器数合計サマリー（例: 便器数 計112基 / 多機能4）
+// 便器数内訳（合計に束ねず、区分ごとの数量をそのまま表示。例: 男子大20・女子56・多機能2）
 function buildToiletSummary(f) {
   const toilets = f.toilets || [];
   if (!toilets.length) return '';
   const totals = {};
-  let sum = 0;
   toilets.forEach(t => Object.entries(t.counts || {}).forEach(([k, v]) => {
     totals[k] = (totals[k] || 0) + v;
-    sum += v;
   }));
-  const multi = totals['多機能'] || 0;
-  return `便器数 計${sum}基${multi ? ` ・ 多機能${multi}` : ''}`;
+  return Object.entries(totals).map(([k, v]) => `${k}${v}`).join('・');
 }
 
 function buildTagsOverlay(code) {
