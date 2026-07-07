@@ -109,11 +109,11 @@ input{font-family:inherit;color:inherit}
 .content{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
 .content::-webkit-scrollbar{width:4px}
 .content::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px}
-.compare-bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;background:var(--t1);color:var(--bg);border-radius:var(--r3);padding:9px 16px;font-size:12px;box-shadow:var(--sh2)}
-.compare-bar-sep{width:1px;height:16px;background:rgba(255,255,255,.25)}
-.compare-bar-clear{background:none;border:1px solid rgba(255,255,255,.3);color:var(--bg);border-radius:var(--r2);height:28px;padding:0 12px;font-size:11.5px;cursor:pointer}
-.compare-bar-clear:hover{background:rgba(255,255,255,.1)}
-.compare-bar-go{margin-left:auto;background:var(--primary);color:#fff;border:none;border-radius:var(--r2);height:28px;padding:0 16px;font-size:11.5px;font-weight:500;cursor:pointer}
+.compare-bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;background:var(--primary);color:#fff;border-radius:var(--r3);padding:9px 16px;font-size:12px;box-shadow:var(--sh2)}
+.compare-bar-sep{width:1px;height:16px;background:rgba(255,255,255,.3)}
+.compare-bar-clear{background:none;border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:var(--r2);height:28px;padding:0 12px;font-size:11.5px;cursor:pointer}
+.compare-bar-clear:hover{background:rgba(255,255,255,.15)}
+.compare-bar-go{margin-left:auto;background:#fff;color:var(--primary);border:none;border-radius:var(--r2);height:28px;padding:0 16px;font-size:11.5px;font-weight:600;cursor:pointer}
 .compare-bar-go:hover{opacity:.88}
 
 /* ── STATS ── */
@@ -343,18 +343,22 @@ tr:hover td{background:var(--hi)}
 .cmp-table td.cmp-multiline{white-space:normal;max-width:220px}
 .cmp-row-lbl{position:sticky;background:var(--s1);font-weight:500;color:var(--t2);z-index:2}
 .cmp-major-lbl{left:0;width:96px;text-align:center;vertical-align:middle;font-weight:600;color:var(--t1);background:var(--s2);z-index:3}
-.cmp-minor-lbl{left:96px;width:110px;background:var(--s1);text-align:center}
-.cmp-col-head{width:190px;background:var(--s0);vertical-align:top;text-align:center}
+.cmp-minor-lbl{left:96px;width:110px;background:var(--s1);text-align:center;vertical-align:middle}
+.cmp-col-head{width:190px;background:var(--s2);vertical-align:middle;text-align:center}
 .cmp-col-name{font-size:13.5px;font-weight:700;color:var(--t1);margin-bottom:8px;display:flex;align-items:baseline;justify-content:center;gap:6px;white-space:normal}
 .cmp-letter{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:var(--primary);color:#fff;font-size:10.5px;font-weight:700;flex-shrink:0}
 .cmp-col-photos{display:flex;gap:6px}
 .cmp-photo-box{flex:1;min-width:0}
-.cmp-photo{width:100%;height:100px;background-size:contain;background-repeat:no-repeat;background-position:center;border-radius:var(--r2);background-color:#D8D8DC}
-[data-theme="dark"] .cmp-photo{background-color:var(--s2)}
+.cmp-photo{width:100%;height:100px;background-size:contain;background-repeat:no-repeat;background-position:center;border-radius:0;background-color:#C4C4C8}
+[data-theme="dark"] .cmp-photo{background-color:#111113}
 .cmp-tagchips{display:flex;flex-wrap:wrap;gap:3px}
 .cmp-shade{background:var(--hi)}
 .cmp-major-lbl.cmp-shade{background:var(--s3)}
 .cmp-minor-lbl.cmp-shade{background:var(--hi)}
+/* 境界線：細=中分類内の既定グリッド／中幅=大分類の区切り／太幅=書式(項目名・見出し)とデータの区切り */
+.cmp-group-start{border-top:1px solid var(--t3)}
+.cmp-minor-lbl{border-right:1.5px solid var(--t1)}
+thead .cmp-major-lbl, thead .cmp-minor-lbl, thead .cmp-col-head{border-bottom:1.5px solid var(--t1)}
 .cmp-editable{background:var(--primary-hi);cursor:text}
 .cmp-editable:focus{outline:2px solid var(--primary);outline-offset:-2px}
 .cmp-remarks-cell{font-size:11px;line-height:1.6;white-space:pre-wrap;min-width:180px}
@@ -1581,16 +1585,16 @@ function cmpRowGroup(majorLabel, subRows) {
   // subRows: [{minor, cells: [htmlString...], editableField?, facilityTitles?}]
   const shade = (cmpShadeToggle = !cmpShadeToggle);
   return subRows.map((sr, i) => {
-    const topBorder = i === 0 ? ' style="border-top:2px solid var(--t2)"' : '';
+    const groupStart = i === 0 ? ' cmp-group-start' : '';
     const labelCell = i === 0
-      ? `<td class="cmp-row-lbl cmp-major-lbl${shade ? ' cmp-shade' : ''}" rowspan="${subRows.length}"${topBorder}>${escHtml(majorLabel)}</td>`
+      ? `<td class="cmp-row-lbl cmp-major-lbl${shade ? ' cmp-shade' : ''}${groupStart}" rowspan="${subRows.length}">${escHtml(majorLabel)}</td>`
       : '';
     const cells = sr.cells.map((c, ci) => {
       const editAttr = sr.editableField ? ` contenteditable="true" data-title="${escHtml(sr.facilityTitles[ci])}" data-field="${sr.editableField}"` : '';
       const remarksCls = sr.editableField ? ' cmp-remarks-cell' : '';
-      return `<td class="cmp-multiline${sr.editableField ? ' cmp-editable' : ''}${remarksCls}${shade ? ' cmp-shade' : ''}"${editAttr}${topBorder}>${c}</td>`;
+      return `<td class="cmp-multiline${sr.editableField ? ' cmp-editable' : ''}${remarksCls}${shade ? ' cmp-shade' : ''}${groupStart}"${editAttr}>${c}</td>`;
     }).join('');
-    return `<tr>${labelCell}<td class="cmp-row-lbl cmp-minor-lbl${shade ? ' cmp-shade' : ''}"${topBorder}>${escHtml(sr.minor)}</td>${cells}</tr>`;
+    return `<tr>${labelCell}<td class="cmp-row-lbl cmp-minor-lbl${shade ? ' cmp-shade' : ''}${groupStart}">${escHtml(sr.minor)}</td>${cells}</tr>`;
   }).join('');
 }
 
