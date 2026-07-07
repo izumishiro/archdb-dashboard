@@ -133,7 +133,7 @@ input{font-family:inherit;color:inherit}
 .sec-ct{font-size:10px;color:var(--t3);margin-left:auto}
 
 /* ── GALLERY ── */
-.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;padding:14px;border-radius:var(--r3)}
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);align-content:start;gap:11px;padding:14px;border-radius:var(--r3);flex:1;min-height:100%}
 [data-theme="light"] .gallery{background:#D8D8DC}
 .gcard{background:var(--s0);border:1px solid var(--s2);border-radius:var(--r4);overflow:hidden;box-shadow:var(--sh0);cursor:pointer;transition:box-shadow var(--ease),transform var(--ease),border-color var(--ease)}
 .gcard:hover{box-shadow:var(--sh2);transform:translateY(-2px);border-color:var(--s3)}
@@ -370,21 +370,6 @@ tr:hover td{background:var(--hi)}
           リスト
         </div>
       </div>
-      <button class="new-reg-btn" onclick="openReg()">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        新規登録
-      </button>
-    </div>
-
-    <!-- CONTROLS 3段目：絞り込みチップ（左）＋検索・テーマ・更新（右） -->
-    <div class="ctrl-row-2">
-      <div class="fchips" id="filterChips">
-        <div class="fc on" onclick="setFilter(this,'all')">すべて <span class="fc-badge" id="fcAll">—</span></div>
-        <div class="fc" onclick="setFilter(this,'daremo')">だれでも <span class="fc-badge" id="fcDaremo">—</span></div>
-        <div class="fc" onclick="setFilter(this,'oyako')">親子 <span class="fc-badge" id="fcOyako">—</span></div>
-        <div class="fc" onclick="setFilter(this,'ostomy')">オストメイト <span class="fc-badge" id="fcOstomy">—</span></div>
-        <div class="fc" onclick="setFilter(this,'lgbtq')">LGBTQ <span class="fc-badge" id="fcLgbtq">—</span></div>
-      </div>
       <div class="ctrl-row-2-right">
         <div class="sec-ct" id="dispCount">— 件</div>
         <div class="srch">
@@ -401,6 +386,21 @@ tr:hover td{background:var(--hi)}
           更新
         </button>
       </div>
+    </div>
+
+    <!-- CONTROLS 3段目：絞り込みチップ（左）＋新規登録（右） -->
+    <div class="ctrl-row-2">
+      <div class="fchips" id="filterChips">
+        <div class="fc on" onclick="setFilter(this,'all')">すべて <span class="fc-badge" id="fcAll">—</span></div>
+        <div class="fc" onclick="setFilter(this,'daremo')">だれでも <span class="fc-badge" id="fcDaremo">—</span></div>
+        <div class="fc" onclick="setFilter(this,'oyako')">親子 <span class="fc-badge" id="fcOyako">—</span></div>
+        <div class="fc" onclick="setFilter(this,'ostomy')">オストメイト <span class="fc-badge" id="fcOstomy">—</span></div>
+        <div class="fc" onclick="setFilter(this,'lgbtq')">LGBTQ <span class="fc-badge" id="fcLgbtq">—</span></div>
+      </div>
+      <button class="new-reg-btn" onclick="openReg()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        新規登録
+      </button>
     </div>
 
     <!-- GALLERY -->
@@ -501,7 +501,7 @@ tr:hover td{background:var(--hi)}
     </div>
     <div class="cfg-foot">
       <button class="cfg-btn cfg-btn-cancel" onclick="closeReg()">キャンセル</button>
-      <button class="cfg-btn cfg-btn-save" onclick="submitNewFacility()">登録してBoxに保存</button>
+      <button class="cfg-btn cfg-btn-save" id="regSaveBtn" onclick="submitNewFacility()">登録してBoxに保存</button>
     </div>
   </div>
 </div>
@@ -567,6 +567,10 @@ tr:hover td{background:var(--hi)}
     <button class="dp-btn dp-btn-sec" onclick="closeDetail()">
       <svg viewBox="0 0 24 24" fill="none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       閉じる
+    </button>
+    <button class="dp-btn dp-btn-sec" onclick="openReg(currentDetailCode)">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg>
+      編集
     </button>
     <button class="dp-btn dp-btn-sec" id="dp-sp-link">
       <svg viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -656,8 +660,11 @@ function regRowHtml(cat, val) {
   </div>`;
 }
 
-function regLocationHtml(locName) {
-  const rows = COMMON_TOILET_CATS.map(c => regRowHtml(c, '')).join('');
+function regLocationHtml(locName, counts) {
+  counts = counts || {};
+  const keys = [...COMMON_TOILET_CATS];
+  Object.keys(counts).forEach(k => { if (!keys.includes(k)) keys.push(k); });
+  const rows = keys.map(c => regRowHtml(c, counts[c] !== undefined ? counts[c] : '')).join('');
   return `<div class="reg-loc">
     <div class="reg-loc-head">
       <input class="cfg-input" placeholder="拠点名（例：メイントイレ）" value="${escHtml(locName || 'メイントイレ')}">
@@ -672,17 +679,50 @@ function regAddLocation() {
   document.getElementById('regLocs').insertAdjacentHTML('beforeend', regLocationHtml(''));
 }
 
-function openReg() {
+let regEditCode = null; // null=新規登録、値あり=編集対象の施設コード
+
+function openReg(code) {
+  regEditCode = code || null;
   document.getElementById('regMsg').className = 'reg-msg';
   document.getElementById('regMsg').textContent = '';
-  document.getElementById('regCode').value = nextFacilityCode();
-  ['regName','regAddr','regUse','regYear','regArch','regCont','regBoxUrl','regDate','regSurveyors']
-    .forEach(id => document.getElementById(id).value = '');
-  document.getElementById('regLocs').innerHTML = regLocationHtml('メイントイレ');
+  const titleEl = document.querySelector('#regModal .cfg-head span');
+  const saveBtn = document.getElementById('regSaveBtn');
+  const codeInput = document.getElementById('regCode');
+
+  if (regEditCode) {
+    const f = DB.facilities.find(x => x.Title === regEditCode);
+    if (!f) { alert('編集対象のデータが見つかりません'); return; }
+    titleEl.textContent = `施設 編集：${f.Title}`;
+    saveBtn.textContent = '更新してBoxに保存';
+    codeInput.value = f.Title;
+    codeInput.disabled = true;
+    document.getElementById('regName').value = f.FacilityName || '';
+    document.getElementById('regAddr').value = f.Address || '';
+    document.getElementById('regUse').value = f.UseType || '';
+    document.getElementById('regYear').value = f.CompletionDate || '';
+    document.getElementById('regArch').value = f.Architect || '';
+    document.getElementById('regCont').value = f.Contractor || '';
+    document.getElementById('regBoxUrl').value = f.boxFolderId ? `https://app.box.com/folder/${f.boxFolderId}` : '';
+    const sv = f.survey || {};
+    document.getElementById('regDate').value = sv.SurveyDate || '';
+    document.getElementById('regSurveyors').value = sv.Surveyors || '';
+    const locs = (f.toilets && f.toilets.length) ? f.toilets : [{ location: 'メイントイレ', counts: {} }];
+    document.getElementById('regLocs').innerHTML = locs.map(l => regLocationHtml(l.location, l.counts)).join('');
+  } else {
+    titleEl.textContent = '施設 新規登録';
+    saveBtn.textContent = '登録してBoxに保存';
+    codeInput.disabled = false;
+    codeInput.value = nextFacilityCode();
+    ['regName','regAddr','regUse','regYear','regArch','regCont','regBoxUrl','regDate','regSurveyors']
+      .forEach(id => document.getElementById(id).value = '');
+    document.getElementById('regLocs').innerHTML = regLocationHtml('メイントイレ');
+  }
   document.getElementById('regModal').classList.add('open');
 }
 function closeReg() {
   document.getElementById('regModal').classList.remove('open');
+  document.getElementById('regCode').disabled = false;
+  regEditCode = null;
 }
 
 function regShowMsg(text, ok) {
@@ -699,8 +739,9 @@ function extractBoxFolderId(url) {
 async function submitNewFacility() {
   const code = document.getElementById('regCode').value.trim();
   const name = document.getElementById('regName').value.trim();
+  const isEdit = !!regEditCode;
   if (!code || !/^T\d+$/.test(code)) { regShowMsg('施設コードは「T」+数字で入力してください（例：T004）', false); return; }
-  if (DB.facilities.some(f => f.Title === code)) { regShowMsg(`施設コード ${code} は既に登録されています`, false); return; }
+  if (!isEdit && DB.facilities.some(f => f.Title === code)) { regShowMsg(`施設コード ${code} は既に登録されています`, false); return; }
   if (!name) { regShowMsg('施設名称を入力してください', false); return; }
 
   // トイレ設備の組み立て（空欄の行・拠点は除外）
@@ -716,6 +757,8 @@ async function submitNewFacility() {
     return { location: locName || '未設定', counts };
   }).filter(t => Object.keys(t.counts).length > 0 || t.location !== '未設定');
 
+  const existing = isEdit ? DB.facilities.find(f => f.Title === regEditCode) : null;
+
   const facility = {
     Title: code,
     FacilityName: name,
@@ -725,7 +768,7 @@ async function submitNewFacility() {
     Architect: document.getElementById('regArch').value.trim(),
     Contractor: document.getElementById('regCont').value.trim(),
     boxFolderId: extractBoxFolderId(document.getElementById('regBoxUrl').value.trim()),
-    bfud: { TagCustom: '' },
+    bfud: (existing && existing.bfud) || { TagCustom: '' },
     survey: {
       SurveyDate: document.getElementById('regDate').value.trim(),
       Surveyors: document.getElementById('regSurveyors').value.trim(),
@@ -735,15 +778,21 @@ async function submitNewFacility() {
     toilets
   };
 
-  regShowMsg('Boxに保存中…', true);
+  regShowMsg(isEdit ? '更新してBoxに保存中…' : 'Boxに保存中…', true);
   try {
     const fileId = await findDbFileId();
     const json = await fetchDbJson();
     json.facilities = json.facilities || [];
-    json.facilities.push(facility);
+    if (isEdit) {
+      const idx = json.facilities.findIndex(f => f.Title === regEditCode);
+      if (idx === -1) throw new Error('更新対象がdb.json内に見つかりません');
+      json.facilities[idx] = facility;
+    } else {
+      json.facilities.push(facility);
+    }
     json.updatedAt = new Date().toISOString().slice(0, 10);
     await boxUploadJson(fileId, json);
-    regShowMsg(`${code}「${name}」を登録しました`, true);
+    regShowMsg(`${code}「${name}」を${isEdit ? '更新' : '登録'}しました`, true);
     await loadData();
     setTimeout(closeReg, 1200);
   } catch (e) {
@@ -1062,6 +1111,7 @@ const TAG_MAP = {
 // グローバルデータストア
 let DB = { facilities: [], bfud: {}, survey: {} };
 let filteredData = [];
+let currentDetailCode = null;
 let currentFilter = 'all';
 
 async function loadData() {
@@ -1299,6 +1349,7 @@ function renderTable() {
 function openDetail(code) {
   const f = DB.facilities.find(x => x.Title === code);
   if (!f) return;
+  currentDetailCode = code;
   const bf = DB.bfud[code] || {};
   const sv = DB.survey[code] || {};
 
