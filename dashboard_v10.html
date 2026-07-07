@@ -4,13 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>建築事例DB</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 <style>
 /* ── TOKENS ─────────────────────────────────── */
 :root {
-  --f: 'DM Sans','Noto Sans JP',sans-serif;
+  --f: -apple-system,BlinkMacSystemFont,'Helvetica Neue','Noto Sans JP',sans-serif;
   --r1:4px; --r2:8px; --r3:12px; --r4:16px; --rp:999px;
   --ease:150ms cubic-bezier(.4,0,.2,1);
   --cud:#EEEDFE; --fud:#3C3489;
@@ -19,24 +16,26 @@
   --cfm:#FBEAF0; --ffm:#72243E;
 }
 [data-theme="light"] {
-  --bg:#EDECEA; --s0:#FFFFFF; --s1:#F4F3F0; --s2:#E6E4E0;
-  --s3:#CCCAC5; --s4:#AEACA6; --t1:#1A1916; --t2:#595750;
-  --t3:#9A9890; --t4:#C4C2BA; --hi:rgba(0,0,0,.04); --ac:rgba(0,0,0,.07);
+  --bg:#FFFFFF; --s0:#FFFFFF; --s1:#F2F2F7; --s2:#E5E5EA;
+  --s3:#D1D1D6; --s4:#AEAEB2; --t1:#1C1C1E; --t2:#6E6E73;
+  --t3:#8E8E93; --t4:#C7C7CC; --hi:rgba(0,0,0,.04); --ac:rgba(0,0,0,.07);
   --sh0:0 1px 2px rgba(0,0,0,.06); --sh1:0 2px 8px rgba(0,0,0,.09),0 1px 2px rgba(0,0,0,.05);
   --sh2:0 6px 20px rgba(0,0,0,.11),0 2px 6px rgba(0,0,0,.06);
-  --acc:#8C8678; --acc-deep:#736D62; --acc-t:#FFFFFF;
-  --acc-sub:rgba(255,255,255,.55); --acc-line:rgba(255,255,255,.18);
-  --acc-hi:rgba(255,255,255,.10); --acc-act:rgba(255,255,255,.16);
+  --acc:#D1D1D6; --acc-deep:#C2C2C7; --acc-t:#1C1C1E;
+  --acc-sub:rgba(28,28,30,.55); --acc-line:rgba(0,0,0,.12);
+  --acc-hi:rgba(0,0,0,.05); --acc-act:rgba(0,0,0,.08);
+  --primary:#007AFF; --primary-hi:rgba(0,122,255,.08);
 }
 [data-theme="dark"] {
-  --bg:#2A2A28; --s0:#343432; --s1:#3E3E3C; --s2:#484846;
-  --s3:#5E5E5A; --s4:#7E7E78; --t1:#F0EFE8; --t2:#AEADA6;
-  --t3:#767470; --t4:#4E4E4C; --hi:rgba(255,255,255,.05); --ac:rgba(255,255,255,.09);
+  --bg:#1C1C1E; --s0:#2C2C2E; --s1:#2C2C2E; --s2:#3A3A3C;
+  --s3:#48484A; --s4:#636366; --t1:#FFFFFF; --t2:#AEAEB2;
+  --t3:#8E8E93; --t4:#48484A; --hi:rgba(255,255,255,.05); --ac:rgba(255,255,255,.09);
   --sh0:0 1px 2px rgba(0,0,0,.35); --sh1:0 2px 8px rgba(0,0,0,.4);
   --sh2:0 6px 20px rgba(0,0,0,.48);
-  --acc:#585450; --acc-deep:#46433F; --acc-t:#F0EFE8;
-  --acc-sub:rgba(240,239,232,.5); --acc-line:rgba(255,255,255,.12);
+  --acc:#3A3A3C; --acc-deep:#2C2C2E; --acc-t:#FFFFFF;
+  --acc-sub:rgba(255,255,255,.55); --acc-line:rgba(255,255,255,.12);
   --acc-hi:rgba(255,255,255,.07); --acc-act:rgba(255,255,255,.13);
+  --primary:#0A84FF; --primary-hi:rgba(10,132,255,.12);
   --cud:#2E2B52; --fud:#AFA9EC; --cbf:#1A2E45; --fbf:#85B7EB;
   --cal:#3E3E3C; --fal:#C8C7C0; --cfm:#3A1828; --ffm:#ED93B1;
 }
@@ -48,7 +47,7 @@ input{font-family:inherit;color:inherit}
 .shell{display:flex;height:100vh;overflow:hidden}
 
 /* ── SIDEBAR ── */
-.sidebar{width:208px;flex-shrink:0;background:var(--acc);border-right:1px solid var(--acc-deep);display:flex;flex-direction:column;transition:background var(--ease)}
+.sidebar{width:208px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--s2);display:flex;flex-direction:column;transition:background var(--ease)}
 .sb-head{padding:20px 16px 16px;border-bottom:1px solid var(--acc-line)}
 .sb-org{font-size:9.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--acc-sub);margin-bottom:4px}
 .sb-title{font-size:15px;font-weight:500;color:var(--acc-t);letter-spacing:-.025em;line-height:1.2}
@@ -57,7 +56,7 @@ input{font-family:inherit;color:inherit}
 .nav-item{display:flex;align-items:center;gap:9px;padding:8px 16px;font-size:12.5px;color:var(--acc-sub);border-left:1.5px solid transparent;cursor:pointer;transition:background var(--ease),color var(--ease)}
 .nav-item svg{width:14px;height:14px;flex-shrink:0;stroke:currentColor;opacity:.7}
 .nav-item:hover{background:var(--acc-hi);color:var(--acc-t)}
-.nav-item.on{color:var(--acc-t);font-weight:500;border-left-color:var(--acc-t);background:var(--acc-act)}
+.nav-item.on{color:var(--primary);font-weight:500;border-left-color:var(--primary);background:var(--primary-hi)}
 .nav-item.on svg{opacity:1}
 .nav-badge{margin-left:auto;font-size:9px;padding:1px 6px;border-radius:var(--rp);background:var(--acc-act);color:var(--acc-t);opacity:.8}
 .sb-foot{margin-top:auto;padding:12px 16px;border-top:1px solid var(--acc-line);display:flex;align-items:center;gap:9px}
@@ -67,7 +66,7 @@ input{font-family:inherit;color:inherit}
 
 /* ── MAIN / TOPBAR ── */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{height:50px;flex-shrink:0;background:var(--acc);border-bottom:1px solid var(--acc-deep);display:flex;align-items:center;gap:8px;padding:0 18px;transition:background var(--ease)}
+.topbar{height:84px;flex-shrink:0;background:var(--acc);border-bottom:1px solid var(--acc-deep);display:flex;align-items:center;gap:8px;padding:0 18px;transition:background var(--ease)}
 .tb-title{font-size:13.5px;font-weight:500;color:var(--acc-t);flex:1;letter-spacing:-.015em}
 .tb-title span{font-weight:300;color:var(--acc-sub);font-size:11px;margin-left:9px;letter-spacing:0}
 .srch{display:flex;align-items:center;gap:6px;background:var(--acc-hi);border:1px solid var(--acc-line);border-radius:var(--rp);padding:0 11px;height:30px;width:214px;transition:border-color var(--ease)}
@@ -108,7 +107,8 @@ input{font-family:inherit;color:inherit}
 .stat-sub{font-size:10px;color:var(--t4);margin-top:6px}
 
 /* ── CONTROLS ── */
-.ctrl-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ctrl-row-1{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.ctrl-row-2{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .vtabs{display:flex;gap:1px;background:var(--s1);border:1px solid var(--s2);border-radius:var(--r2);padding:2px}
 .vtab{display:flex;align-items:center;gap:4px;padding:4px 11px;font-size:11px;color:var(--t3);border-radius:calc(var(--r2) - 2px);cursor:pointer;transition:background var(--ease),color var(--ease)}
 .vtab svg{width:12px;height:12px;stroke:currentColor}
@@ -117,7 +117,7 @@ input{font-family:inherit;color:inherit}
 .fchips{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .fc{padding:4px 11px;border-radius:var(--rp);font-size:11px;border:1px solid var(--s2);background:var(--s0);color:var(--t2);cursor:pointer;transition:all var(--ease)}
 .fc:hover{border-color:var(--s3);color:var(--t1)}
-.fc.on{background:var(--t1);color:var(--bg);border-color:var(--t1);font-weight:500}
+.fc.on{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:500}
 .fc-badge{font-size:9px;opacity:.65;margin-left:2px}
 .fc.on .fc-badge{opacity:.85}
 .sec-ct{font-size:10px;color:var(--t3);margin-left:auto}
@@ -172,7 +172,7 @@ tr:hover td{background:var(--hi)}
 
 /* ── LOADING / ERROR ── */
 .loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;gap:12px;color:var(--t3)}
-.loading-spinner{width:28px;height:28px;border:2px solid var(--s2);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite}
+.loading-spinner{width:28px;height:28px;border:2px solid var(--s2);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .error-state{background:var(--s0);border:1px solid var(--s2);border-radius:var(--r3);padding:20px;text-align:center;color:var(--t3);font-size:12px}
 .error-state strong{display:block;color:var(--t2);margin-bottom:4px}
@@ -197,15 +197,31 @@ tr:hover td{background:var(--hi)}
 .cfg-field{display:flex;flex-direction:column;gap:5px}
 .cfg-lbl{font-size:10px;font-weight:500;color:var(--t3);letter-spacing:.04em;text-transform:uppercase}
 .cfg-input{height:36px;padding:0 11px;border:1px solid var(--s2);border-radius:var(--r2);background:var(--s1);color:var(--t1);font-size:12px;font-family:var(--f);outline:none;transition:border-color var(--ease)}
-.cfg-input:focus{border-color:var(--acc);background:var(--s0);box-shadow:0 0 0 3px rgba(140,134,120,.15)}
+.cfg-input:focus{border-color:var(--primary);background:var(--s0);box-shadow:0 0 0 3px rgba(0,122,255,.15)}
 .cfg-note{font-size:10.5px;color:var(--t3);line-height:1.6;background:var(--s1);border:1px solid var(--s2);border-radius:var(--r2);padding:10px 12px}
 .cfg-note code{font-family:monospace;font-size:10px;background:var(--s2);padding:1px 5px;border-radius:3px}
 .cfg-foot{padding:12px 20px;border-top:1px solid var(--s2);display:flex;gap:8px;justify-content:flex-end}
 .cfg-btn{height:32px;padding:0 16px;border-radius:var(--r2);font-size:11.5px;font-weight:500;cursor:pointer;border:none;transition:opacity var(--ease)}
 .cfg-btn:active{opacity:.75}
+.reg-box{width:640px;max-height:85vh;display:flex;flex-direction:column}
+.reg-body{overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.reg-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.reg-fw{grid-column:1/-1}
+.reg-loc{border:1px solid var(--s2);border-radius:var(--r2);padding:12px;background:var(--s1)}
+.reg-loc-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.reg-loc-head input{flex:1}
+.reg-row{display:flex;gap:6px;margin-bottom:6px}
+.reg-row input:first-child{flex:2}
+.reg-row input:last-child{flex:1}
+.reg-mini-btn{font-size:10.5px;padding:4px 9px;border-radius:5px;background:var(--s2);color:var(--t2);border:none;cursor:pointer}
+.reg-mini-btn:hover{background:var(--s3)}
+.reg-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:14px;padding:0 4px}
+.reg-msg{font-size:11.5px;padding:8px 12px;border-radius:6px;display:none}
+.reg-msg.err{display:block;background:#FBE7E4;color:#8C2E1E}
+.reg-msg.ok{display:block;background:#E8F5EE;color:#1D6A4A}
 .cfg-btn-cancel{background:var(--s1);color:var(--t2)}
 .cfg-btn-cancel:hover{background:var(--s2)}
-.cfg-btn-save{background:var(--acc);color:#fff}
+.cfg-btn-save{background:var(--primary);color:#fff}
 .cfg-btn-save:hover{opacity:.88}
 
 /* ── DETAIL PANEL ── */
@@ -236,7 +252,7 @@ tr:hover td{background:var(--hi)}
 .dp-strip::-webkit-scrollbar{height:5px}
 .dp-strip::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
 .dp-sthumb{flex:0 0 auto;width:64px;height:64px;border-radius:6px;background:var(--s2);cursor:pointer;background-size:cover;background-position:center;border:2px solid transparent;position:relative;overflow:hidden}
-.dp-sthumb.active{border-color:var(--acc)}
+.dp-sthumb.active{border-color:var(--primary)}
 .dp-sthumb:not(.loaded)::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,var(--s1),var(--s1) 4px,var(--s2) 4px,var(--s2) 8px)}
 .dp-strip-more{flex:0 0 auto;width:64px;height:64px;border-radius:6px;background:var(--s2);color:var(--t3);font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;text-align:center;line-height:1.3}
 .dp-toilet-loc{margin-bottom:10px}
@@ -244,7 +260,7 @@ tr:hover td{background:var(--hi)}
 .dp-toilet-loc-name{font-size:11px;font-weight:500;color:var(--t2);margin-bottom:5px}
 .dp-toilet-counts{display:flex;flex-wrap:wrap;gap:6px}
 .dp-toilet-chip{font-size:11px;background:var(--s1);border:1px solid var(--s2);border-radius:6px;padding:4px 9px;color:var(--t1);display:flex;align-items:center;gap:5px}
-.dp-toilet-chip b{color:var(--acc);font-weight:600}
+.dp-toilet-chip b{color:var(--primary);font-weight:600}
 .dp-sec{padding:14px 16px;border-bottom:1px solid var(--s2)}
 .dp-sec:last-child{border-bottom:none;padding-bottom:20px}
 .dp-sec-ttl{font-size:9.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
@@ -257,7 +273,7 @@ tr:hover td{background:var(--hi)}
 .dp-btn{flex:1;height:32px;border-radius:var(--r2);font-size:11.5px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:5px;transition:opacity var(--ease),background var(--ease);cursor:pointer}
 .dp-btn:active{opacity:.75}
 .dp-btn svg{width:12px;height:12px;stroke:currentColor;stroke-width:2}
-.dp-btn-pri{background:var(--acc);color:var(--acc-t);border:1px solid var(--acc-deep)}
+.dp-btn-pri{background:var(--primary);color:#fff;border:1px solid var(--primary)}
 .dp-btn-pri:hover{opacity:.88}
 .dp-btn-sec{background:var(--s1);color:var(--t2);border:1px solid var(--s2)}
 .dp-btn-sec:hover{background:var(--s2);color:var(--t1)}
@@ -295,6 +311,10 @@ tr:hover td{background:var(--hi)}
     建築物（拡張予定）
   </div>
   <div class="nav-sec">管理</div>
+  <div class="nav-item" onclick="openReg()">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    新規登録
+  </div>
   <div class="nav-item" onclick="openConfig()">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
     Box接続設定
@@ -311,7 +331,7 @@ tr:hover td{background:var(--hi)}
 <!-- ═══ MAIN ═══ -->
 <div class="main">
   <header class="topbar">
-    <div class="tb-title">ダッシュボード <span>建築事例</span></div>
+    <div class="tb-title">建築事例</div>
     <div class="srch">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" id="searchInput" placeholder="施設名・住所で検索…" oninput="filterCards()">
@@ -342,7 +362,7 @@ tr:hover td{background:var(--hi)}
     <!-- STATS: 案B採用のため撤去。件数は絞り込みチップのバッジに統合 -->
 
     <!-- CONTROLS -->
-    <div class="ctrl-row">
+    <div class="ctrl-row-1">
       <div class="vtabs">
         <div class="vtab on" id="tg" onclick="sv('g')">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -353,6 +373,9 @@ tr:hover td{background:var(--hi)}
           リスト
         </div>
       </div>
+      <div class="sec-ct" id="dispCount">— 件</div>
+    </div>
+    <div class="ctrl-row-2">
       <div class="fchips" id="filterChips">
         <div class="fc on" onclick="setFilter(this,'all')">すべて <span class="fc-badge" id="fcAll">—</span></div>
         <div class="fc" onclick="setFilter(this,'daremo')">だれでも <span class="fc-badge" id="fcDaremo">—</span></div>
@@ -360,7 +383,6 @@ tr:hover td{background:var(--hi)}
         <div class="fc" onclick="setFilter(this,'ostomy')">オストメイト <span class="fc-badge" id="fcOstomy">—</span></div>
         <div class="fc" onclick="setFilter(this,'lgbtq')">LGBTQ <span class="fc-badge" id="fcLgbtq">—</span></div>
       </div>
-      <div class="sec-ct" id="dispCount">— 件</div>
     </div>
 
     <!-- GALLERY -->
@@ -425,6 +447,43 @@ tr:hover td{background:var(--hi)}
     <div class="cfg-foot">
       <button class="cfg-btn cfg-btn-cancel" onclick="boxLogout()">ログアウト（設定削除）</button>
       <button class="cfg-btn cfg-btn-save" onclick="saveConfig()">保存してBoxにログイン</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新規登録モーダル -->
+<div class="cfg-modal" id="regModal" onclick="if(event.target===this)closeReg()">
+  <div class="cfg-box reg-box">
+    <div class="cfg-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:15px;height:15px;flex-shrink:0"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>施設 新規登録</span>
+      <button onclick="closeReg()" style="margin-left:auto;background:var(--acc-act);color:#fff;height:24px;padding:0 10px;border-radius:var(--r2);font-size:11px;cursor:pointer;border:none">閉じる</button>
+    </div>
+    <div class="reg-body">
+      <div class="reg-msg" id="regMsg"></div>
+
+      <div class="reg-grid">
+        <div class="cfg-field"><div class="cfg-lbl">施設コード</div><input class="cfg-input" id="regCode" placeholder="T004"></div>
+        <div class="cfg-field"><div class="cfg-lbl">施設名称</div><input class="cfg-input" id="regName" placeholder="◯◯サービスエリア"></div>
+        <div class="cfg-field reg-fw"><div class="cfg-lbl">住所</div><input class="cfg-input" id="regAddr" placeholder="都道府県から"></div>
+        <div class="cfg-field"><div class="cfg-lbl">用途</div><input class="cfg-input" id="regUse" placeholder="道路休憩施設（SA）等"></div>
+        <div class="cfg-field"><div class="cfg-lbl">竣工年</div><input class="cfg-input" id="regYear" placeholder="2020"></div>
+        <div class="cfg-field"><div class="cfg-lbl">設計者</div><input class="cfg-input" id="regArch" placeholder="不明なら空欄"></div>
+        <div class="cfg-field"><div class="cfg-lbl">施工者</div><input class="cfg-input" id="regCont" placeholder="不明なら空欄"></div>
+        <div class="cfg-field reg-fw"><div class="cfg-lbl">Box フォルダURL</div><input class="cfg-input" id="regBoxUrl" placeholder="https://xxx.app.box.com/folder/123456789"></div>
+        <div class="cfg-field"><div class="cfg-lbl">調査日</div><input class="cfg-input" id="regDate" type="date"></div>
+        <div class="cfg-field reg-fw"><div class="cfg-lbl">調査員</div><input class="cfg-input" id="regSurveyors" placeholder="氏名（複数は・区切り）"></div>
+      </div>
+
+      <div class="cfg-field">
+        <div class="cfg-lbl">トイレ設備（拠点ごとに区分と数量を入力。不明な区分は空欄でOK）</div>
+        <div id="regLocs"></div>
+        <button class="reg-mini-btn" style="align-self:flex-start" onclick="regAddLocation()">＋ 拠点を追加（メイン以外にトイレがある場合）</button>
+      </div>
+    </div>
+    <div class="cfg-foot">
+      <button class="cfg-btn cfg-btn-cancel" onclick="closeReg()">キャンセル</button>
+      <button class="cfg-btn cfg-btn-save" onclick="submitNewFacility()">登録してBoxに保存</button>
     </div>
   </div>
 </div>
@@ -549,13 +608,149 @@ function openConfig() {
   const auth = getAuth();
   document.getElementById('cfgSecret').value = auth.secret || '';
   const st = document.getElementById('cfgStatus');
-  if (auth.rt) { st.textContent = '接続済（トークン保持中）'; st.style.color = 'var(--acc)'; }
+  if (auth.rt) { st.textContent = '接続済（トークン保持中）'; st.style.color = 'var(--primary)'; }
   else if (auth.secret) { st.textContent = 'シークレット保存済・未ログイン'; st.style.color = 'var(--t3)'; }
   else { st.textContent = '未接続'; st.style.color = 'var(--t3)'; }
   document.getElementById('cfgModal').classList.add('open');
 }
 function closeConfig() {
   document.getElementById('cfgModal').classList.remove('open');
+}
+
+/* ══════════════════════════════════════════
+   新規登録モーダル
+══════════════════════════════════════════ */
+const COMMON_TOILET_CATS = ['男子大便器', '男子小便器', '男子洗面', '女子', '女子洗面', '多機能', 'ファミリー', '男女共用', 'ベビーコーナー', '小児用'];
+
+function nextFacilityCode() {
+  const nums = DB.facilities
+    .map(f => (f.Title.match(/^T(\d+)$/) || [])[1])
+    .filter(Boolean).map(Number);
+  const next = (nums.length ? Math.max(...nums) : 0) + 1;
+  return 'T' + String(next).padStart(3, '0');
+}
+
+function regRowHtml(cat, val) {
+  return `<div class="reg-row">
+    <input class="cfg-input" placeholder="区分名（例：多機能）" value="${escHtml(cat || '')}">
+    <input class="cfg-input" type="number" placeholder="数量" value="${val != null ? val : ''}">
+    <button class="reg-del" onclick="this.parentElement.remove()" title="この行を削除">×</button>
+  </div>`;
+}
+
+function regLocationHtml(locName) {
+  const rows = COMMON_TOILET_CATS.map(c => regRowHtml(c, '')).join('');
+  return `<div class="reg-loc">
+    <div class="reg-loc-head">
+      <input class="cfg-input" placeholder="拠点名（例：メイントイレ）" value="${escHtml(locName || 'メイントイレ')}">
+      <button class="reg-del" onclick="this.closest('.reg-loc').remove()" title="この拠点を削除">×</button>
+    </div>
+    <div class="reg-rows">${rows}</div>
+    <button class="reg-mini-btn" onclick="this.previousElementSibling.insertAdjacentHTML('beforeend', regRowHtml('', ''))">＋ 区分行を追加</button>
+  </div>`;
+}
+
+function regAddLocation() {
+  document.getElementById('regLocs').insertAdjacentHTML('beforeend', regLocationHtml(''));
+}
+
+function openReg() {
+  document.getElementById('regMsg').className = 'reg-msg';
+  document.getElementById('regMsg').textContent = '';
+  document.getElementById('regCode').value = nextFacilityCode();
+  ['regName','regAddr','regUse','regYear','regArch','regCont','regBoxUrl','regDate','regSurveyors']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('regLocs').innerHTML = regLocationHtml('メイントイレ');
+  document.getElementById('regModal').classList.add('open');
+}
+function closeReg() {
+  document.getElementById('regModal').classList.remove('open');
+}
+
+function regShowMsg(text, ok) {
+  const el = document.getElementById('regMsg');
+  el.className = 'reg-msg ' + (ok ? 'ok' : 'err');
+  el.textContent = text;
+}
+
+function extractBoxFolderId(url) {
+  const m = (url || '').match(/folder\/(\d+)/);
+  return m ? m[1] : '';
+}
+
+async function submitNewFacility() {
+  const code = document.getElementById('regCode').value.trim();
+  const name = document.getElementById('regName').value.trim();
+  if (!code || !/^T\d+$/.test(code)) { regShowMsg('施設コードは「T」+数字で入力してください（例：T004）', false); return; }
+  if (DB.facilities.some(f => f.Title === code)) { regShowMsg(`施設コード ${code} は既に登録されています`, false); return; }
+  if (!name) { regShowMsg('施設名称を入力してください', false); return; }
+
+  // トイレ設備の組み立て（空欄の行・拠点は除外）
+  const toilets = Array.from(document.querySelectorAll('#regLocs .reg-loc')).map(locEl => {
+    const locName = locEl.querySelector('.reg-loc-head input').value.trim();
+    const counts = {};
+    locEl.querySelectorAll('.reg-row').forEach(row => {
+      const inputs = row.querySelectorAll('input');
+      const k = inputs[0].value.trim();
+      const v = inputs[1].value.trim();
+      if (k && v !== '') counts[k] = Number(v);
+    });
+    return { location: locName || '未設定', counts };
+  }).filter(t => Object.keys(t.counts).length > 0 || t.location !== '未設定');
+
+  const facility = {
+    Title: code,
+    FacilityName: name,
+    UseType: document.getElementById('regUse').value.trim(),
+    Address: document.getElementById('regAddr').value.trim(),
+    CompletionDate: document.getElementById('regYear').value.trim(),
+    Architect: document.getElementById('regArch').value.trim(),
+    Contractor: document.getElementById('regCont').value.trim(),
+    boxFolderId: extractBoxFolderId(document.getElementById('regBoxUrl').value.trim()),
+    bfud: { TagCustom: '' },
+    survey: {
+      SurveyDate: document.getElementById('regDate').value.trim(),
+      Surveyors: document.getElementById('regSurveyors').value.trim(),
+      Status: '調査済',
+      PhotoCount: 0 // 手入力廃止。表示時にBoxフォルダから自動カウントされる
+    },
+    toilets
+  };
+
+  regShowMsg('Boxに保存中…', true);
+  try {
+    const fileId = await findDbFileId();
+    const json = await fetchDbJson();
+    json.facilities = json.facilities || [];
+    json.facilities.push(facility);
+    json.updatedAt = new Date().toISOString().slice(0, 10);
+    await boxUploadJson(fileId, json);
+    regShowMsg(`${code}「${name}」を登録しました`, true);
+    await loadData();
+    setTimeout(closeReg, 1200);
+  } catch (e) {
+    console.error(e);
+    regShowMsg('保存に失敗しました： ' + e.message, false);
+  }
+}
+
+async function boxUploadJson(fileId, jsonObj) {
+  const token = await getAccessToken();
+  if (!token) throw new Error('NOT_AUTHED');
+  const form = new FormData();
+  const blob = new Blob([JSON.stringify(jsonObj, null, 2)], { type: 'application/json' });
+  form.append('attributes', JSON.stringify({ name: 'db.json' }));
+  form.append('file', blob, 'db.json');
+  const res = await fetch(`https://upload.box.com/api/2.0/files/${fileId}/content`, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token },
+    body: form
+  });
+  if (!res.ok) {
+    const t = await res.text().catch(() => '');
+    throw new Error(`Box保存失敗 HTTP ${res.status} ${t.slice(0, 200)}`);
+  }
+  return res.json();
 }
 
 /* ══════════════════════════════════════════
@@ -671,12 +866,18 @@ async function getImageBlobUrl(fileId) {
   return url;
 }
 
-async function listImageFiles(folderId) {
-  const res = await boxFetch(`https://api.box.com/2.0/folders/${folderId}/items?fields=id,name,type&limit=1000`);
-  const j = await res.json();
-  const files = (j.entries || []).filter(e => e.type === 'file' && IMG_EXT.test(e.name));
-  files.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
-  return files;
+const folderListCache = new Map(); // folderId -> Promise<files[]>（同一フォルダの重複API呼び出しを防止）
+function listImageFiles(folderId) {
+  if (!folderListCache.has(folderId)) {
+    folderListCache.set(folderId, (async () => {
+      const res = await boxFetch(`https://api.box.com/2.0/folders/${folderId}/items?fields=id,name,type&limit=1000`);
+      const j = await res.json();
+      const files = (j.entries || []).filter(e => e.type === 'file' && IMG_EXT.test(e.name));
+      files.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+      return files;
+    })());
+  }
+  return folderListCache.get(folderId);
 }
 
 /* ══════════════════════════════════════════
@@ -722,6 +923,37 @@ function hydrateThumbs(list) {
       return;
     }
     getThumbUrl(f).then(url => { if (url) applyThumbToCards(f.Title, url); });
+  });
+}
+
+// 写真枚数の自動カウント（Boxフォルダの実物を数える。課員の手入力は不要）
+const photoCountCache = new Map(); // Title -> number
+
+function applyPhotoCountToCards(title, count) {
+  document.querySelectorAll(`[data-photocount-for="${CSS.escape(title)}"]`).forEach(el => {
+    const svg = el.querySelector('svg');
+    el.innerHTML = '';
+    if (svg) el.appendChild(svg);
+    el.append(String(count));
+    // 未登録ハッチングの解除（1枚以上あれば「写真未登録」表示をやめる）
+    if (count > 0) {
+      const thumbEl = document.querySelector(`[data-thumb-for="${CSS.escape(title)}"]`);
+      if (thumbEl) thumbEl.classList.remove('no-photo');
+    }
+  });
+}
+
+function hydratePhotoCounts(list) {
+  list.forEach(f => {
+    if (!f.boxFolderId) return;
+    if (photoCountCache.has(f.Title)) {
+      applyPhotoCountToCards(f.Title, photoCountCache.get(f.Title));
+      return;
+    }
+    listImageFiles(f.boxFolderId).then(files => {
+      photoCountCache.set(f.Title, files.length);
+      applyPhotoCountToCards(f.Title, files.length);
+    }).catch(e => console.warn('写真枚数カウント失敗', f.Title, e.message));
   });
 }
 
@@ -828,7 +1060,7 @@ async function loadData() {
         <div class="error-state" style="grid-column:1/-1">
           <strong>Boxに未接続です</strong>
           初回のみ接続設定が必要です。設定後はログイン状態が自動維持されます。<br>
-          <button onclick="openConfig()" style="margin-top:10px;padding:6px 14px;border-radius:6px;background:var(--acc);color:#fff;border:none;cursor:pointer;font-size:11px">Box接続設定を開く</button>
+          <button onclick="openConfig()" style="margin-top:10px;padding:6px 14px;border-radius:6px;background:var(--primary);color:#fff;border:none;cursor:pointer;font-size:11px">Box接続設定を開く</button>
         </div>`;
       tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:24px">未接続</td></tr>`;
       return;
@@ -906,7 +1138,7 @@ async function loadData() {
       <div class="error-state" style="grid-column:1/-1">
         <strong>${authErr ? 'Boxへのログインが必要です' : 'Boxへの接続に失敗しました'}</strong>
         ${authErr ? '接続設定からログインしてください。' : escHtml(err.message)}<br><br>
-        <button onclick="openConfig()" style="margin-top:10px;padding:6px 14px;border-radius:6px;background:var(--acc);color:#fff;border:none;cursor:pointer;font-size:11px">Box接続設定を開く</button>
+        <button onclick="openConfig()" style="margin-top:10px;padding:6px 14px;border-radius:6px;background:var(--primary);color:#fff;border:none;cursor:pointer;font-size:11px">Box接続設定を開く</button>
       </div>`;
     tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:24px">接続エラー</td></tr>`;
   }
@@ -985,7 +1217,8 @@ function renderGallery() {
   }
   gallery.innerHTML = filteredData.map(f => {
     const sv = DB.survey[f.Title] || {};
-    const photoCnt = sv.PhotoCount || 0;
+    const cachedCnt = photoCountCache.get(f.Title);
+    const photoCnt = cachedCnt != null ? cachedCnt : (sv.PhotoCount || 0);
     const hasPhoto = photoCnt > 0;
     const tagsOv = buildTagsOverlay(f.Title);
     const toiletSummary = buildToiletSummary(f);
@@ -1000,7 +1233,7 @@ function renderGallery() {
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
           <span>${hasPhoto ? 'サムネ写真' : '写真未登録'}</span>
         </div>
-        <div class="gcnt">
+        <div class="gcnt" data-photocount-for="${escHtml(f.Title)}">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>${photoCnt}
         </div>
         ${tagsOv ? `<div class="gtags-ov">${tagsOv}</div>` : ''}
@@ -1016,6 +1249,7 @@ function renderGallery() {
     </div>`;
   }).join('');
   hydrateThumbs(filteredData);
+  hydratePhotoCounts(filteredData);
 }
 
 function renderTable() {
@@ -1060,8 +1294,17 @@ function openDetail(code) {
   document.getElementById('dp-cont').textContent = f.Contractor || '—';
   document.getElementById('dp-survey-date').textContent = fmtDate(sv.SurveyDate) || '—';
   document.getElementById('dp-status').textContent = sv.Status || '—';
-  document.getElementById('dp-photo-count').textContent = sv.PhotoCount != null ? `${sv.PhotoCount}枚` : '—';
-  document.getElementById('dp-photocnt').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>${sv.PhotoCount || 0}枚`;
+  document.getElementById('dp-photo-count').textContent = `${(photoCountCache.get(f.Title) ?? (sv.PhotoCount || 0))}枚`;
+  document.getElementById('dp-photocnt').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>${(photoCountCache.get(f.Title) ?? (sv.PhotoCount || 0))}枚`;
+  if (f.boxFolderId) {
+    listImageFiles(f.boxFolderId).then(files => {
+      photoCountCache.set(f.Title, files.length);
+      if (document.getElementById('dp-code').textContent.includes(f.Title)) {
+        document.getElementById('dp-photocnt').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>${files.length}枚`;
+        document.getElementById('dp-photo-count').textContent = `${files.length}枚`;
+      }
+    }).catch(() => {});
+  }
 
   // サムネ（キャッシュ済みなら即反映、未取得ならギャラリー側の非同期取得を待つ）
   const heroEl = document.querySelector('.dp-hero');
@@ -1182,7 +1425,7 @@ document.addEventListener('keydown', e => {
             <div class="error-state" style="grid-column:1/-1">
               <strong>Boxログインに失敗しました</strong>
               ${escHtml(err.message)}<br>シークレットが正しいか確認してください。<br>
-              <button onclick="openConfig()" style="margin-top:10px;padding:6px 14px;border-radius:6px;background:var(--acc);color:#fff;border:none;cursor:pointer;font-size:11px">Box接続設定を開く</button>
+              <button onclick="openConfig()" style="margin-top:10px;padding:6px 14px;border-radius:6px;background:var(--primary);color:#fff;border:none;cursor:pointer;font-size:11px">Box接続設定を開く</button>
             </div>`;
         });
       return;
