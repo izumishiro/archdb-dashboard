@@ -236,6 +236,19 @@ tr:hover td{background:var(--hi)}
 .reg-row input:last-child{flex:1}
 .reg-mini-btn{font-size:10.5px;padding:4px 9px;border-radius:5px;background:var(--s2);color:var(--t2);border:none;cursor:pointer}
 .reg-mini-btn:hover{background:var(--s3)}
+.reg-mini-btn-sm{margin-top:6px;font-size:10px;padding:3px 8px}
+.reg-majors{display:flex;flex-direction:column;gap:10px}
+.reg-major{border:1px solid var(--s2);border-radius:var(--r2);padding:10px;background:var(--s0)}
+.reg-major-ttl{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:7px;letter-spacing:.03em}
+.reg-minor-rows{display:flex;flex-direction:column;gap:5px}
+.reg-minor-row{display:flex;align-items:center;gap:7px}
+.reg-minor-lbl{font-size:11.5px;color:var(--t1);width:64px;flex-shrink:0}
+.reg-minor-input{height:30px;width:80px;flex:0 0 80px}
+.reg-washiki-lbl{font-size:10px;color:var(--t3);flex-shrink:0;margin-left:4px}
+.reg-washiki-input{height:26px;width:60px;flex:0 0 60px;font-size:11px}
+.reg-minor-custom{gap:6px}
+.reg-minor-custom input:first-child{flex:2}
+.reg-minor-custom input:last-child{flex:1;width:auto}
 .reg-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:14px;padding:0 4px}
 .reg-msg{font-size:11.5px;padding:8px 12px;border-radius:6px;display:none}
 .reg-msg.err{display:block;background:#FBE7E4;color:#8C2E1E}
@@ -281,7 +294,11 @@ tr:hover td{background:var(--hi)}
 .dp-toilet-loc{margin-bottom:10px}
 .dp-toilet-loc:last-child{margin-bottom:0}
 .dp-toilet-loc-name{font-size:11px;font-weight:500;color:var(--t2);margin-bottom:5px}
+.dp-toilet-major{margin-bottom:6px}
+.dp-toilet-major:last-child{margin-bottom:0}
+.dp-toilet-major-lbl{font-size:9.5px;font-weight:600;color:var(--t3);letter-spacing:.04em;display:block;margin-bottom:3px}
 .dp-toilet-counts{display:flex;flex-wrap:wrap;gap:6px}
+.dp-toilet-chip small{opacity:.75;margin-left:3px;font-weight:400}
 .dp-toilet-chip{font-size:11px;background:var(--s1);border:1px solid var(--s2);border-radius:6px;padding:4px 9px;color:var(--t1);display:flex;align-items:center;gap:5px}
 .dp-toilet-chip b{color:var(--primary);font-weight:600}
 .dp-toilet-chip.tdm{background:var(--cdm);border-color:var(--cdm);color:var(--fdm)}
@@ -527,7 +544,7 @@ tr:hover td{background:var(--hi)}
       </div>
 
       <div class="cfg-field">
-        <div class="cfg-lbl">トイレ設備（拠点ごとに区分と数量を入力。不明な区分は空欄でOK。数量不明でも区分名だけ入れれば「あり」として記録されます）</div>
+        <div class="cfg-lbl">トイレ設備（拠点ごとに男子・女子・共用の区分で入力。不明な項目は空欄でOK）</div>
         <div id="regLocs"></div>
         <button class="reg-mini-btn" style="align-self:flex-start" onclick="regAddLocation()">＋ 拠点を追加（メイン以外にトイレがある場合）</button>
       </div>
@@ -707,7 +724,14 @@ function closeConfig() {
 /* ══════════════════════════════════════════
    新規登録モーダル
 ══════════════════════════════════════════ */
-const COMMON_TOILET_CATS = ['男子大便器', '男子小便器', '男子洗面', '女子', '女子洗面', '多機能', 'ファミリー', '男女共用', '男子オストメイト', '女子オストメイト', '共用オストメイト', '授乳室・おむつ交換', '小児用'];
+// 大分類・中分類の定義（比較表作成時にも同じ構造を使用する）
+const TOILET_MAJOR_CATS = ['男子', '女子', '共用'];
+const TOILET_MINOR_CATS = {
+  '男子': ['大便器', '小便器', '洗面', 'オストメイト', 'パウダー'],
+  '女子': ['大便器', '洗面', 'オストメイト', 'パウダー'],
+  '共用': ['だれでも', '多機能', 'ファミリー', '授乳室・おむつ交換', 'オストメイト']
+};
+const TOILET_WASHIKI_KEY = '大便器_和式内数'; // 大便器の内数（和式）専用キー
 
 function nextFacilityCode() {
   const nums = DB.facilities
@@ -717,31 +741,62 @@ function nextFacilityCode() {
   return 'T' + String(next).padStart(3, '0');
 }
 
-function regRowHtml(cat, val) {
-  return `<div class="reg-row">
-    <input class="cfg-input" placeholder="区分名（例：多機能）" value="${escHtml(cat || '')}">
+function regCustomRowHtml(cat, val) {
+  return `<div class="reg-row reg-minor-custom">
+    <input class="cfg-input" placeholder="その他の項目名" value="${escHtml(cat || '')}">
     <input class="cfg-input" type="number" placeholder="数量" value="${val != null ? val : ''}">
     <button class="reg-del" onclick="this.parentElement.remove()" title="この行を削除">×</button>
   </div>`;
 }
 
-function regLocationHtml(locName, counts) {
-  counts = counts || {};
-  const keys = [...COMMON_TOILET_CATS];
-  Object.keys(counts).forEach(k => { if (!keys.includes(k)) keys.push(k); });
-  const rows = keys.map(c => regRowHtml(c, counts[c] !== undefined ? counts[c] : '')).join('');
+function regMinorRowHtml(major, minor, val, washikiVal) {
+  if (minor === '大便器') {
+    return `<div class="reg-minor-row" data-minor="大便器">
+      <span class="reg-minor-lbl">大便器</span>
+      <input class="cfg-input reg-minor-input" type="number" placeholder="数量" data-minor-val value="${val != null ? val : ''}">
+      <span class="reg-washiki-lbl">内、和式</span>
+      <input class="cfg-input reg-washiki-input" type="number" placeholder="0" data-washiki-val value="${washikiVal != null ? washikiVal : ''}">
+    </div>`;
+  }
+  return `<div class="reg-minor-row" data-minor="${escHtml(minor)}">
+    <span class="reg-minor-lbl">${escHtml(minor)}</span>
+    <input class="cfg-input reg-minor-input" type="number" placeholder="数量" data-minor-val value="${val != null ? val : ''}">
+  </div>`;
+}
+
+function regMajorBlockHtml(major, categories) {
+  categories = categories || {};
+  const predefined = TOILET_MINOR_CATS[major];
+  const rows = predefined.map(minor => {
+    if (minor === '大便器') {
+      return regMinorRowHtml(major, minor, categories['大便器'], categories[TOILET_WASHIKI_KEY]);
+    }
+    return regMinorRowHtml(major, minor, categories[minor]);
+  }).join('');
+  // 定義済み以外の追加項目（過去データや特殊項目）
+  const extraKeys = Object.keys(categories).filter(k => k !== TOILET_WASHIKI_KEY && !predefined.includes(k));
+  const extraRows = extraKeys.map(k => regCustomRowHtml(k, categories[k])).join('');
+  return `<div class="reg-major" data-major="${escHtml(major)}">
+    <div class="reg-major-ttl">${escHtml(major)}</div>
+    <div class="reg-minor-rows">${rows}${extraRows}</div>
+    <button class="reg-mini-btn reg-mini-btn-sm" onclick="this.previousElementSibling.insertAdjacentHTML('beforeend', regCustomRowHtml('', ''))">＋ その他項目を追加</button>
+  </div>`;
+}
+
+function regLocationHtml(locName, categories) {
+  categories = categories || {};
+  const majors = TOILET_MAJOR_CATS.map(m => regMajorBlockHtml(m, categories[m])).join('');
   return `<div class="reg-loc">
     <div class="reg-loc-head">
-      <input class="cfg-input" placeholder="拠点名（例：メイントイレ）" value="${escHtml(locName || 'メイントイレ')}">
+      <input class="cfg-input" placeholder="拠点名（例：メイントイレ）" value="${escHtml(locName || '')}">
       <button class="reg-del" onclick="this.closest('.reg-loc').remove()" title="この拠点を削除">×</button>
     </div>
-    <div class="reg-rows">${rows}</div>
-    <button class="reg-mini-btn" onclick="this.previousElementSibling.insertAdjacentHTML('beforeend', regRowHtml('', ''))">＋ 区分行を追加</button>
+    <div class="reg-majors">${majors}</div>
   </div>`;
 }
 
 function regAddLocation() {
-  document.getElementById('regLocs').insertAdjacentHTML('beforeend', regLocationHtml(''));
+  document.getElementById('regLocs').insertAdjacentHTML('beforeend', regLocationHtml('', {}));
 }
 
 function regRefRowHtml(name, url, date) {
@@ -783,8 +838,8 @@ function openReg(code) {
     const sv = f.survey || {};
     document.getElementById('regDate').value = sv.SurveyDate || '';
     document.getElementById('regSurveyors').value = sv.Surveyors || '';
-    const locs = (f.toilets && f.toilets.length) ? f.toilets : [{ location: 'メイントイレ', counts: {} }];
-    document.getElementById('regLocs').innerHTML = locs.map(l => regLocationHtml(l.location, l.counts)).join('');
+    const locs = (f.toilets && f.toilets.length) ? f.toilets : [{ location: '', categories: {} }];
+    document.getElementById('regLocs').innerHTML = locs.map(l => regLocationHtml(l.location, l.categories)).join('');
     document.getElementById('regDrawingUrl').value = f.drawingFileId ? `https://app.box.com/file/${f.drawingFileId}` : '';
     const refs = f.references || [];
     document.getElementById('regRefs').innerHTML = refs.length
@@ -797,7 +852,7 @@ function openReg(code) {
     codeInput.value = nextFacilityCode();
     ['regName','regAddr','regUse','regYear','regArch','regCont','regBoxUrl','regDate','regSurveyors','regDrawingUrl']
       .forEach(id => document.getElementById(id).value = '');
-    document.getElementById('regLocs').innerHTML = regLocationHtml('メイントイレ');
+    document.getElementById('regLocs').innerHTML = regLocationHtml('', {});
     document.getElementById('regRefs').innerHTML = '';
   }
   document.getElementById('regModal').classList.add('open');
@@ -831,18 +886,34 @@ async function submitNewFacility() {
   if (!isEdit && DB.facilities.some(f => f.Title === code)) { regShowMsg(`施設コード ${code} は既に登録されています`, false); return; }
   if (!name) { regShowMsg('施設名称を入力してください', false); return; }
 
-  // トイレ設備の組み立て（空欄の行・拠点は除外）
+  // トイレ設備の組み立て（大分類[男子/女子/共用]ごとに中分類の数量を収集。空欄項目は除外）
   const toilets = Array.from(document.querySelectorAll('#regLocs .reg-loc')).map(locEl => {
     const locName = locEl.querySelector('.reg-loc-head input').value.trim();
-    const counts = {};
-    locEl.querySelectorAll('.reg-row').forEach(row => {
-      const inputs = row.querySelectorAll('input');
-      const k = inputs[0].value.trim();
-      const v = inputs[1].value.trim();
-      if (k) counts[k] = v !== '' ? Number(v) : 1; // 数量未入力＝「あり」として1を記録
+    const categories = {};
+    locEl.querySelectorAll('.reg-major').forEach(majorEl => {
+      const major = majorEl.dataset.major;
+      const cat = {};
+      majorEl.querySelectorAll('.reg-minor-row').forEach(row => {
+        const minor = row.dataset.minor;
+        const valInput = row.querySelector('[data-minor-val]');
+        const v = valInput.value.trim();
+        if (v !== '') cat[minor] = Number(v);
+        const washikiInput = row.querySelector('[data-washiki-val]');
+        if (washikiInput) {
+          const wv = washikiInput.value.trim();
+          if (wv !== '') cat[TOILET_WASHIKI_KEY] = Number(wv);
+        }
+      });
+      majorEl.querySelectorAll('.reg-minor-custom').forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        const k = inputs[0].value.trim();
+        const v = inputs[1].value.trim();
+        if (k) cat[k] = v !== '' ? Number(v) : 1; // 数量未入力＝「あり」として1を記録
+      });
+      if (Object.keys(cat).length > 0) categories[major] = cat;
     });
-    return { location: locName || '未設定', counts };
-  }).filter(t => Object.keys(t.counts).length > 0 || t.location !== '未設定');
+    return { location: locName || '未設定', categories };
+  }).filter(t => Object.keys(t.categories).length > 0 || t.location !== '未設定');
 
   // 参考資料の組み立て（URLはhttps://必須。空行は除外）
   const references = [];
@@ -1346,7 +1417,7 @@ const TAG_MAP = {
 
 // トイレ設備の区分名 → BF・UDタグ判定キーワード（一般トイレ項目は判定対象外）
 const TAG_KEYWORDS = {
-  TagDaremo: ['多機能', 'ファミリー', '男女共用', 'LGBTQ'],
+  TagDaremo: ['だれでも', '多機能', 'ファミリー', '男女共用', 'LGBTQ'],
   TagOyako:  ['ファミリー', '小児用', '子供用'],
   TagOstomy: ['オストメイト'],
   TagLGBTQ:  ['男女共用']
@@ -1391,7 +1462,7 @@ async function loadData() {
     const list = json.facilities || [];
 
     function deriveTagsFromToilets(toilets) {
-      const keys = (toilets || []).flatMap(t => Object.keys(t.counts || {}));
+      const keys = (toilets || []).flatMap(t => Object.values(t.categories || {}).flatMap(cat => Object.keys(cat || {})));
       const has = kwList => keys.some(k => kwList.some(kw => k.includes(kw)));
       return {
         TagDaremo: has(TAG_KEYWORDS.TagDaremo),
@@ -1496,15 +1567,40 @@ function buildTags(code) {
     .join('');
 }
 
+// 大分類[男子/女子/共用]・中分類の数量を横断集計（和式内数は大便器に付随させる）
+function flattenToiletTotals(toilets) {
+  const totals = {}; // label -> {value, washiki, hasWashiki}
+  (toilets || []).forEach(t => {
+    const cats = t.categories || {};
+    TOILET_MAJOR_CATS.forEach(major => {
+      const catObj = cats[major];
+      if (!catObj) return;
+      Object.entries(catObj).forEach(([minor, v]) => {
+        if (minor === TOILET_WASHIKI_KEY) return;
+        const label = major === '共用' ? minor : (major + minor);
+        if (!totals[label]) totals[label] = { value: 0, washiki: 0, hasWashiki: false };
+        totals[label].value += v;
+      });
+      if (catObj[TOILET_WASHIKI_KEY] != null) {
+        const label = major + '大便器';
+        if (!totals[label]) totals[label] = { value: 0, washiki: 0, hasWashiki: false };
+        totals[label].washiki += catObj[TOILET_WASHIKI_KEY];
+        totals[label].hasWashiki = true;
+      }
+    });
+  });
+  return totals;
+}
+
 // 便器数内訳（合計に束ねず、区分ごとの数量をそのまま表示。項目単位で改行されるよう各項目を折返し不可にする）
 function buildToiletSummary(f) {
   const toilets = f.toilets || [];
   if (!toilets.length) return '';
-  const totals = {};
-  toilets.forEach(t => Object.entries(t.counts || {}).forEach(([k, v]) => {
-    totals[k] = (totals[k] || 0) + v;
-  }));
-  return Object.entries(totals).map(([k, v]) => `<span class="gtl-item">${escHtml(k)}${v}</span>`).join('');
+  const totals = flattenToiletTotals(toilets);
+  return Object.entries(totals).map(([label, o]) => {
+    const txt = o.hasWashiki ? `${label}${o.value}(内和式${o.washiki})` : `${label}${o.value}`;
+    return `<span class="gtl-item">${escHtml(txt)}</span>`;
+  }).join('');
 }
 
 function buildTagsOverlay(code) {
@@ -1642,19 +1738,28 @@ function openDetail(code) {
     .join('');
   document.getElementById('dp-tags').innerHTML = tagHtml || '<span class="unknown">タグ未登録</span>';
 
-  // トイレ設備（複数拠点対応・数量チップ表示）
+  // トイレ設備（拠点 → 大分類[男子/女子/共用] → 中分類の階層表示）
   const toiletSec = document.getElementById('dp-toilet-sec');
   const toilets = f.toilets || [];
   if (toilets.length) {
     toiletSec.style.display = 'block';
-    document.getElementById('dp-toilet').innerHTML = toilets.map(t => `
+    document.getElementById('dp-toilet').innerHTML = toilets.map(t => {
+      const cats = t.categories || {};
+      const majorBlocks = TOILET_MAJOR_CATS.map(major => {
+        const catObj = cats[major];
+        if (!catObj || !Object.keys(catObj).length) return '';
+        const chips = Object.entries(catObj).filter(([k]) => k !== TOILET_WASHIKI_KEY).map(([k, v]) => {
+          const washiki = (k === '大便器' && catObj[TOILET_WASHIKI_KEY] != null) ? `<small>(内和式${catObj[TOILET_WASHIKI_KEY]})</small>` : '';
+          return `<span class="dp-toilet-chip ${toiletChipColorClass(major === '共用' ? k : major + k)}">${escHtml(major === '共用' ? k : major + k)}<b>${v}</b>${washiki}</span>`;
+        }).join('');
+        return `<div class="dp-toilet-major"><span class="dp-toilet-major-lbl">${escHtml(major)}</span><div class="dp-toilet-counts">${chips}</div></div>`;
+      }).join('');
+      return `
       <div class="dp-toilet-loc">
         <div class="dp-toilet-loc-name">${escHtml(t.location || '')}</div>
-        <div class="dp-toilet-counts">${
-          Object.entries(t.counts || {}).map(([k, v]) => `<span class="dp-toilet-chip ${toiletChipColorClass(k)}">${escHtml(k)}<b>${v}</b></span>`).join('')
-          || '<span class="unknown">数量未登録</span>'
-        }</div>
-      </div>`).join('');
+        ${majorBlocks || '<span class="unknown">数量未登録</span>'}
+      </div>`;
+    }).join('');
   } else {
     toiletSec.style.display = 'none';
   }
