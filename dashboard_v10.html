@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>建築事例DB</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 /* ── TOKENS ─────────────────────────────────── */
 :root {
@@ -340,12 +341,20 @@ tr:hover td{background:var(--hi)}
 .cmp-table{border-collapse:separate;border-spacing:0;font-size:12px;background:var(--s0)}
 .cmp-table th, .cmp-table td{border:1px solid var(--s2);padding:8px 12px;text-align:left;white-space:nowrap;vertical-align:top}
 .cmp-table td.cmp-multiline{white-space:normal;max-width:220px}
-.cmp-row-lbl{position:sticky;left:0;background:var(--s1);font-weight:500;color:var(--t2);z-index:2;min-width:120px}
-.cmp-sec-row td{background:var(--s2);font-weight:600;color:var(--t1);font-size:11px;letter-spacing:.03em}
-.cmp-sec-row .cmp-row-lbl{background:var(--s2)}
-.cmp-col-head{min-width:190px;background:var(--s0)}
-.cmp-photo{width:170px;height:110px;background-size:cover;background-position:center;border-radius:var(--r2);background-color:var(--s1)}
+.cmp-row-lbl{position:sticky;background:var(--s1);font-weight:500;color:var(--t2);z-index:2}
+.cmp-major-lbl{left:0;min-width:96px;text-align:center;vertical-align:middle;font-weight:600;color:var(--t1);background:var(--s2);z-index:3}
+.cmp-minor-lbl{left:96px;min-width:110px;background:var(--s1)}
+.cmp-col-head{min-width:190px;background:var(--s0);vertical-align:top}
+.cmp-col-name{font-size:13.5px;font-weight:700;color:var(--t1);margin-bottom:8px;display:flex;align-items:baseline;gap:6px;white-space:normal}
+.cmp-letter{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:var(--primary);color:#fff;font-size:10.5px;font-weight:700;flex-shrink:0}
+.cmp-col-photos{display:flex;gap:6px}
+.cmp-photo-box{flex:1;min-width:0}
+.cmp-photo{width:100%;height:100px;background-size:cover;background-position:center;border-radius:var(--r2);background-color:#D8D8DC}
+[data-theme="dark"] .cmp-photo{background-color:var(--s2)}
+.cmp-drawing{background-size:contain;background-repeat:no-repeat;background-color:var(--s1)}
 .cmp-tagchips{display:flex;flex-wrap:wrap;gap:3px}
+.cmp-editable{background:var(--primary-hi);cursor:text}
+.cmp-editable:focus{outline:2px solid var(--primary);outline-offset:-2px}
 .cmp-foot{font-size:10px;color:var(--t3);line-height:1.7;padding:12px 0 0}
 @media print {
   body *{visibility:hidden}
@@ -590,6 +599,8 @@ tr:hover td{background:var(--hi)}
         <div class="cfg-field reg-fw"><div class="cfg-lbl">Box フォルダURL</div><input class="cfg-input" id="regBoxUrl" placeholder="https://xxx.app.box.com/folder/123456789"></div>
         <div class="cfg-field"><div class="cfg-lbl">調査日</div><input class="cfg-input" id="regDate" type="date"></div>
         <div class="cfg-field reg-fw"><div class="cfg-lbl">調査員</div><input class="cfg-input" id="regSurveyors" placeholder="氏名（複数は・区切り）"></div>
+        <div class="cfg-field reg-fw"><div class="cfg-lbl">調査員所見</div><textarea class="cfg-input" id="regRemarksSurvey" rows="2" style="height:auto;padding:8px 11px;resize:vertical" placeholder="現地調査時の所見・気づき等"></textarea></div>
+        <div class="cfg-field reg-fw"><div class="cfg-lbl">備考</div><textarea class="cfg-input" id="regRemarks" rows="2" style="height:auto;padding:8px 11px;resize:vertical" placeholder="その他の備考"></textarea></div>
       </div>
 
       <div class="cfg-field">
@@ -622,6 +633,14 @@ tr:hover td{background:var(--hi)}
     <div class="cmp-head-ttl">施設比較表</div>
     <div class="cmp-head-sub" id="cmpCount">0件</div>
     <div style="margin-left:auto;display:flex;gap:8px">
+      <button class="dp-btn dp-btn-sec" id="cmpSaveBtn" onclick="saveCompareEdits()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        変更を保存
+      </button>
+      <button class="dp-btn dp-btn-sec" onclick="exportCompareExcel()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="19"/><line x1="15" y1="13" x2="9" y2="19"/></svg>
+        Excel出力
+      </button>
       <button class="dp-btn dp-btn-sec" onclick="printCompareView()">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         PDF出力（印刷）
@@ -906,6 +925,8 @@ function openReg(code) {
     const sv = f.survey || {};
     document.getElementById('regDate').value = sv.SurveyDate || '';
     document.getElementById('regSurveyors').value = sv.Surveyors || '';
+    document.getElementById('regRemarksSurvey').value = sv.Remarks || '';
+    document.getElementById('regRemarks').value = f.Remarks || '';
     const locs = (f.toilets && f.toilets.length) ? f.toilets : [{ location: '', categories: {} }];
     document.getElementById('regLocs').innerHTML = locs.map(l => regLocationHtml(l.location, l.categories)).join('');
     document.getElementById('regDrawingUrl').value = f.drawingFileId ? `https://app.box.com/file/${f.drawingFileId}` : '';
@@ -918,7 +939,7 @@ function openReg(code) {
     saveBtn.textContent = '登録してBoxに保存';
     codeInput.disabled = false;
     codeInput.value = nextFacilityCode();
-    ['regName','regAddr','regUse','regYear','regArch','regCont','regBoxUrl','regDate','regSurveyors','regDrawingUrl']
+    ['regName','regAddr','regUse','regYear','regArch','regCont','regBoxUrl','regDate','regSurveyors','regDrawingUrl','regRemarksSurvey','regRemarks']
       .forEach(id => document.getElementById(id).value = '');
     document.getElementById('regLocs').innerHTML = regLocationHtml('', {});
     document.getElementById('regRefs').innerHTML = '';
@@ -1013,10 +1034,12 @@ async function submitNewFacility() {
     boxFolderId: extractBoxFolderId(document.getElementById('regBoxUrl').value.trim()),
     drawingFileId,
     references,
+    Remarks: document.getElementById('regRemarks').value.trim(),
     bfud: (existing && existing.bfud) || { TagCustom: '' },
     survey: {
       SurveyDate: document.getElementById('regDate').value.trim(),
       Surveyors: document.getElementById('regSurveyors').value.trim(),
+      Remarks: document.getElementById('regRemarksSurvey').value.trim(),
       Status: '調査済',
       PhotoCount: 0 // 手入力廃止。表示時にBoxフォルダから自動カウントされる
     },
@@ -1549,25 +1572,41 @@ function cmpRowHtml(label, htmlCells) {
   return `<tr><td class="cmp-row-lbl">${escHtml(label)}</td>${htmlCells.map(c => `<td class="cmp-multiline">${c}</td>`).join('')}</tr>`;
 }
 
+function cmpRowGroup(majorLabel, subRows) {
+  // subRows: [{minor, cells: [htmlString...], editableField?, facilityTitles?}]
+  return subRows.map((sr, i) => {
+    const labelCell = i === 0
+      ? `<td class="cmp-row-lbl cmp-major-lbl" rowspan="${subRows.length}">${escHtml(majorLabel)}</td>`
+      : '';
+    const cells = sr.cells.map((c, ci) => {
+      const editAttr = sr.editableField ? ` contenteditable="true" data-title="${escHtml(sr.facilityTitles[ci])}" data-field="${sr.editableField}"` : '';
+      return `<td class="cmp-multiline${sr.editableField ? ' cmp-editable' : ''}"${editAttr}>${c}</td>`;
+    }).join('');
+    return `<tr>${labelCell}<td class="cmp-row-lbl cmp-minor-lbl">${escHtml(sr.minor)}</td>${cells}</tr>`;
+  }).join('');
+}
+
 function openCompareView() {
   if (compareSet.size < 2) { alert('比較には2件以上選択してください'); return; }
-  const facilities = DB.facilities.filter(f => compareSet.has(f.Title));
+  const facilities = Array.from(compareSet).map(t => DB.facilities.find(f => f.Title === t)).filter(Boolean);
   document.getElementById('cmpCount').textContent = `${facilities.length}件`;
+  const letters = facilities.map((f, i) => String.fromCharCode(65 + i));
 
   // トイレ設備：全施設の大分類・中分類を横断して行の一覧を作る（共用→男子→女子の順）
-  const toiletRowKeys = []; // [{major, minor}]
+  const toiletRowKeys = {}; // major -> [minor,...]
   TOILET_MAJOR_CATS.forEach(major => {
-    const seen = new Set();
+    const seen = [];
     facilities.forEach(f => {
       (f.toilets || []).forEach(t => {
         const cat = (t.categories || {})[major];
         if (!cat) return;
         Object.keys(cat).forEach(minor => {
           if (minor === TOILET_WASHIKI_KEY) return;
-          if (!seen.has(minor)) { seen.add(minor); toiletRowKeys.push({ major, minor }); }
+          if (!seen.includes(minor)) seen.push(minor);
         });
       });
     });
+    if (seen.length) toiletRowKeys[major] = seen;
   });
 
   function sumMinor(f, major, minor) {
@@ -1583,69 +1622,94 @@ function openCompareView() {
     return hasWashiki ? `${total}<small style="color:var(--t3)">(内和式${washiki})</small>` : `${total}`;
   }
 
-  const cols = facilities.length;
-  let html = `<table class="cmp-table"><thead><tr><th class="cmp-row-lbl" style="background:var(--s1)">項目</th>`;
-  html += facilities.map(f => `<th class="cmp-col-head">${escHtml(f.FacilityName || f.Title)}<br><span style="font-weight:400;color:var(--t3);font-size:10.5px">${escHtml(f.Title)}</span></th>`).join('');
+  // ヘッダー：比較記号（A/B/C…）＋施設名（濃色・番号非表示）＋サムネ＋平面図
+  let html = `<table class="cmp-table"><thead><tr><td class="cmp-row-lbl cmp-major-lbl"></td><td class="cmp-row-lbl cmp-minor-lbl">項目</td>`;
+  html += facilities.map((f, i) => {
+    const cached = thumbCache.get(f.Title);
+    const photoBox = `<div class="cmp-photo-box">${cached ? `<div class="cmp-photo" style="background-image:url('${cached}')" data-photo-for="${escHtml(f.Title)}"></div>` : `<div class="cmp-photo" data-photo-for="${escHtml(f.Title)}"></div>`}</div>`;
+    let drawBox = '';
+    if (f.drawingFileId) {
+      drawBox = `<div class="cmp-photo-box cmp-drawing-box"><div class="cmp-photo cmp-drawing" data-drawing-for="${escHtml(f.Title)}"></div></div>`;
+    }
+    return `<th class="cmp-col-head">
+      <div class="cmp-col-name"><span class="cmp-letter">${letters[i]}</span>${escHtml(f.FacilityName || f.Title)}</div>
+      <div class="cmp-col-photos">${photoBox}${drawBox}</div>
+    </th>`;
+  }).join('');
   html += `</tr></thead><tbody>`;
 
-  html += cmpSecRow('基本情報');
-  html += cmpRow('住所', facilities.map(f => escHtml(f.Address || '—')));
-  html += cmpRow('用途', facilities.map(f => escHtml(f.UseType || '—')));
-  html += cmpRow('竣工年', facilities.map(f => escHtml(f.CompletionDate || '不明')));
-  html += cmpRow('設計者', facilities.map(f => escHtml(f.Architect || '不明')));
-  html += cmpRow('施工者', facilities.map(f => escHtml(f.Contractor || '不明')));
+  // 基本情報
+  html += cmpRowGroup('基本情報', [
+    { minor: '住所', cells: facilities.map(f => escHtml(f.Address || '—')) },
+    { minor: '用途', cells: facilities.map(f => escHtml(f.UseType || '—')) },
+    { minor: '竣工年', cells: facilities.map(f => escHtml(f.CompletionDate || '—')) },
+    { minor: '設計者', cells: facilities.map(f => escHtml(f.Architect || '—')) },
+    { minor: '施工者', cells: facilities.map(f => escHtml(f.Contractor || '—')) }
+  ]);
 
-  html += cmpSecRow('サムネイル');
-  html += cmpRowHtml('写真', facilities.map(f => {
-    const cached = thumbCache.get(f.Title);
-    return cached ? `<div class="cmp-photo" style="background-image:url('${cached}')"></div>` : `<div class="cmp-photo"></div>`;
-  }));
+  // BF・UD分類
+  html += cmpRowGroup('BF・UD分類', [
+    { minor: '該当タグ', cells: facilities.map(f => `<div class="cmp-tagchips">${buildTags(f.Title) || '<span class="unknown">—</span>'}</div>`) }
+  ]);
 
-  html += cmpSecRow('BF・UD分類');
-  html += cmpRowHtml('該当タグ', facilities.map(f => `<div class="cmp-tagchips">${buildTags(f.Title) || '<span class="unknown">タグ未登録</span>'}</div>`));
+  // トイレ設備（共用→男子→女子）
+  TOILET_MAJOR_CATS.forEach(major => {
+    const minors = toiletRowKeys[major];
+    if (!minors || !minors.length) return;
+    html += cmpRowGroup(`トイレ設備｜${major}`, minors.map(minor => ({
+      minor,
+      cells: facilities.map(f => sumMinor(f, major, minor))
+    })));
+  });
 
-  if (toiletRowKeys.length) {
-    html += cmpSecRow('トイレ設備');
-    toiletRowKeys.forEach(({ major, minor }) => {
-      const label = major === '共用' ? minor : (major + minor);
-      html += cmpRow(label, facilities.map(f => sumMinor(f, major, minor)));
-    });
-  }
+  // 調査情報（調査員所見は編集可能）
+  html += cmpRowGroup('調査情報', [
+    { minor: '調査日', cells: facilities.map(f => escHtml(fmtDate((f.survey || {}).SurveyDate) || '—')) },
+    { minor: '調査員', cells: facilities.map(f => escHtml((f.survey || {}).Surveyors || '—')) },
+    { minor: '写真枚数', cells: facilities.map(f => `${photoCountCache.get(f.Title) ?? ((f.survey || {}).PhotoCount || 0)}枚`) },
+    { minor: '調査員所見', editableField: 'survey.Remarks', facilityTitles: facilities.map(f => f.Title), cells: facilities.map(f => escHtml((f.survey || {}).Remarks || '')) }
+  ]);
 
-  html += cmpSecRow('調査情報');
-  html += cmpRow('調査日', facilities.map(f => escHtml(fmtDate((f.survey || {}).SurveyDate) || '—')));
-  html += cmpRow('調査員', facilities.map(f => escHtml((f.survey || {}).Surveyors || '—')));
-  html += cmpRow('写真枚数', facilities.map(f => `${photoCountCache.get(f.Title) ?? ((f.survey || {}).PhotoCount || 0)}枚`));
+  // 参考資料
+  html += cmpRowGroup('参考資料', [
+    { minor: '引用元', cells: facilities.map(f => {
+      const refs = f.references || [];
+      if (!refs.length) return '<span class="unknown">—</span>';
+      return refs.map(r => `${escHtml(r.name || r.url || '')}${r.acquiredDate ? `<br><small style="color:var(--t3)">取得日：${escHtml(r.acquiredDate)}</small>` : ''}`).join('<hr style="border:none;border-top:1px solid var(--s2);margin:4px 0">');
+    }) }
+  ]);
 
-  html += cmpSecRow('参考資料');
-  html += cmpRowHtml('引用元', facilities.map(f => {
-    const refs = f.references || [];
-    if (!refs.length) return '<span class="unknown">なし</span>';
-    return refs.map(r => `${escHtml(r.name || r.url || '')}${r.acquiredDate ? `<br><small style="color:var(--t3)">取得日：${escHtml(r.acquiredDate)}</small>` : ''}`).join('<hr style="border:none;border-top:1px solid var(--s2);margin:4px 0">');
-  }));
+  // 備考（編集可能）
+  html += cmpRowGroup('備考', [
+    { minor: '備考', editableField: 'Remarks', facilityTitles: facilities.map(f => f.Title), cells: facilities.map(f => escHtml(f.Remarks || '')) }
+  ]);
 
   html += `</tbody></table>`;
 
-  // 脚注（引用元URL・取得日・著作権注記を自動付与）
   const todayStr = new Date().toISOString().slice(0, 10);
   const anyRefs = facilities.some(f => (f.references || []).length);
   html += `<div class="cmp-foot">
     ※本比較表は建築技術課「建築事例DB」より ${escHtml(todayStr)} に出力。トイレ設備数量は現地調査時点の記録に基づく。
     ${anyRefs ? '※参考資料の著作権は各権利者に帰属する。引用元・取得日は各資料欄に記載。' : ''}
+    ※調査員所見・備考欄はこの画面から直接編集し「変更を保存」で反映できる。
   </div>`;
 
   document.getElementById('cmpBody').innerHTML = html;
   document.getElementById('compareView').classList.add('open');
+  window.__cmpFacilities = facilities; // Excel出力・保存で再利用
 
-  // サムネ未取得の施設があれば非同期で取得しプレビューに反映
+  // サムネ・平面図の非同期反映
   facilities.forEach(f => {
     if (!thumbCache.get(f.Title) && f.boxFolderId) {
       getThumbUrl(f).then(url => {
-        if (!url || !document.getElementById('compareView').classList.contains('open')) return;
-        document.querySelectorAll('.cmp-photo').forEach((el, i) => {
-          if (facilities[i] && facilities[i].Title === f.Title) el.style.backgroundImage = `url("${url}")`;
-        });
+        if (!url) return;
+        document.querySelectorAll(`[data-photo-for="${CSS.escape(f.Title)}"]`).forEach(el => { el.style.backgroundImage = `url("${url}")`; });
       });
+    }
+    if (f.drawingFileId) {
+      getImageBlobUrl(f.drawingFileId).then(url => {
+        document.querySelectorAll(`[data-drawing-for="${CSS.escape(f.Title)}"]`).forEach(el => { el.style.backgroundImage = `url("${url}")`; });
+      }).catch(() => {});
     }
   });
 }
@@ -1656,6 +1720,96 @@ function closeCompareView() {
 
 function printCompareView() {
   window.print();
+}
+
+// 編集可能セル（調査員所見・備考）の変更をBoxに保存
+async function saveCompareEdits() {
+  const cells = document.querySelectorAll('#cmpBody [contenteditable="true"]');
+  if (!cells.length) return;
+  const btn = document.getElementById('cmpSaveBtn');
+  const origLabel = btn.innerHTML;
+  btn.innerHTML = '保存中…';
+  btn.disabled = true;
+  try {
+    const dbFileId = await findDbFileId();
+    const json = await fetchDbJson();
+    cells.forEach(cell => {
+      const title = cell.dataset.title;
+      const field = cell.dataset.field; // 'survey.Remarks' or 'Remarks'
+      const val = cell.textContent.trim();
+      const f = (json.facilities || []).find(x => x.Title === title);
+      if (!f) return;
+      const parts = field.split('.');
+      if (parts.length === 2) {
+        f[parts[0]] = f[parts[0]] || {};
+        f[parts[0]][parts[1]] = val;
+      } else {
+        f[field] = val;
+      }
+    });
+    json.updatedAt = new Date().toISOString().slice(0, 10);
+    await boxUploadJson(dbFileId, json);
+    btn.innerHTML = '保存しました ✓';
+    await loadData();
+    setTimeout(() => { btn.innerHTML = origLabel; btn.disabled = false; }, 1600);
+  } catch (e) {
+    console.error(e);
+    alert('保存に失敗しました：' + e.message);
+    btn.innerHTML = origLabel;
+    btn.disabled = false;
+  }
+}
+
+// Excel出力（SheetJS）
+function exportCompareExcel() {
+  const facilities = window.__cmpFacilities || [];
+  if (!facilities.length) return;
+  const aoa = [];
+  aoa.push(['大分類', '項目', ...facilities.map(f => f.FacilityName || f.Title)]);
+  const pushRow = (major, minor, values) => aoa.push([major, minor, ...values]);
+
+  pushRow('基本情報', '住所', facilities.map(f => f.Address || '—'));
+  pushRow('基本情報', '用途', facilities.map(f => f.UseType || '—'));
+  pushRow('基本情報', '竣工年', facilities.map(f => f.CompletionDate || '—'));
+  pushRow('基本情報', '設計者', facilities.map(f => f.Architect || '—'));
+  pushRow('基本情報', '施工者', facilities.map(f => f.Contractor || '—'));
+
+  pushRow('BF・UD分類', '該当タグ', facilities.map(f => {
+    const bf = DB.bfud[f.Title] || {};
+    return Object.entries(TAG_MAP).filter(([k]) => bf[k]).map(([, v]) => v.label).join('・') || '—';
+  }));
+
+  TOILET_MAJOR_CATS.forEach(major => {
+    const minorsSeen = [];
+    facilities.forEach(f => (f.toilets || []).forEach(t => {
+      const cat = (t.categories || {})[major];
+      if (!cat) return;
+      Object.keys(cat).forEach(m => { if (m !== TOILET_WASHIKI_KEY && !minorsSeen.includes(m)) minorsSeen.push(m); });
+    }));
+    minorsSeen.forEach(minor => {
+      pushRow(`トイレ設備｜${major}`, minor, facilities.map(f => {
+        let total = 0, has = false;
+        (f.toilets || []).forEach(t => {
+          const cat = (t.categories || {})[major];
+          if (cat && cat[minor] != null) { total += cat[minor]; has = true; }
+        });
+        return has ? total : '—';
+      }));
+    });
+  });
+
+  pushRow('調査情報', '調査日', facilities.map(f => fmtDate((f.survey || {}).SurveyDate) || '—'));
+  pushRow('調査情報', '調査員', facilities.map(f => (f.survey || {}).Surveyors || '—'));
+  pushRow('調査情報', '写真枚数', facilities.map(f => photoCountCache.get(f.Title) ?? ((f.survey || {}).PhotoCount || 0)));
+  pushRow('調査情報', '調査員所見', facilities.map(f => (f.survey || {}).Remarks || ''));
+
+  pushRow('参考資料', '引用元', facilities.map(f => (f.references || []).map(r => r.name || r.url).join(' / ') || '—'));
+  pushRow('備考', '備考', facilities.map(f => f.Remarks || ''));
+
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '比較表');
+  XLSX.writeFile(wb, `建築事例DB_比較表_${new Date().toISOString().slice(0, 10)}.xlsx`);
 }
 
 let currentFilter = 'all';
@@ -1877,7 +2031,7 @@ function renderGallery() {
     const tagsOv = buildTagsOverlay(f.Title);
     const toiletSummary = buildToiletSummary(f);
     const year = f.CompletionDate || null;
-    const metaYear = year ? `${year}年竣工` : `<span class="unknown">竣工年不明</span>`;
+    const metaYear = year ? `${year}年竣工` : `<span class="unknown">—</span>`;
     const addr = f.Address || '';
 
     return `
@@ -1926,7 +2080,7 @@ function renderTable() {
       <td><div class="tn">${escHtml(f.FacilityName || f.Title)}</div><div class="tsb">${escHtml(f.Title)}</div></td>
       <td style="color:var(--t3);font-size:11px">${escHtml(f.Address || '')}</td>
       <td>${tags || '—'}</td>
-      <td style="font-size:11px;color:var(--t3)">${f.CompletionDate || '<span class="unknown">不明</span>'}</td>
+      <td style="font-size:11px;color:var(--t3)">${f.CompletionDate || '<span class="unknown">—</span>'}</td>
       <td style="font-size:11px;color:var(--t3)">${fmtDate(sv.SurveyDate) || '—'}</td>
       <td><div class="st"><span class="sd ${statusOk ? 'sd-ok' : 'sd-ng'}"></span>${escHtml(sv.Status || '未設定')}</div></td>
     </tr>`;
@@ -1946,7 +2100,7 @@ function openDetail(code) {
   document.getElementById('dp-code').textContent = `施設コード：${f.Title}`;
   document.getElementById('dp-name').textContent = f.FacilityName || '—';
   document.getElementById('dp-use').textContent = f.UseType || '—';
-  document.getElementById('dp-year').textContent = f.CompletionDate || '不明';
+  document.getElementById('dp-year').textContent = f.CompletionDate || '—';
   document.getElementById('dp-arch').textContent = f.Architect || '—';
   document.getElementById('dp-cont').textContent = f.Contractor || '—';
   document.getElementById('dp-survey-date').textContent = fmtDate(sv.SurveyDate) || '—';
