@@ -135,7 +135,7 @@ input{font-family:inherit;color:inherit}
 .gname{font-size:12.5px;font-weight:500;color:var(--t1);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gmeta{font-size:10.5px;color:var(--t3);display:flex;align-items:center;gap:5px;margin-bottom:8px}
 .gmeta svg{width:10px;height:10px;stroke:currentColor;flex-shrink:0}
-.gtl{display:flex;flex-wrap:wrap;gap:3px}
+.gtl{font-size:11px;color:var(--t3)}
 
 /* ── TAGS ── */
 .tag{font-size:9.5px;padding:2px 7px;border-radius:var(--rp);font-weight:500;white-space:nowrap}
@@ -339,7 +339,7 @@ tr:hover td{background:var(--hi)}
     <div class="stats">
       <div class="stat"><div class="stat-lbl">総登録件数</div><div class="stat-num" id="stTotal">—</div><div class="stat-sub" id="stSub">読込中…</div></div>
       <div class="stat"><div class="stat-lbl">だれでもトイレ</div><div class="stat-num" id="stDaremo">—</div><div class="stat-sub">登録件数</div></div>
-      <div class="stat"><div class="stat-lbl">BF対応</div><div class="stat-num" id="stBF">—</div><div class="stat-sub">登録件数</div></div>
+      <div class="stat"><div class="stat-lbl">オストメイト対応</div><div class="stat-num" id="stBF">—</div><div class="stat-sub">登録件数</div></div>
       <div class="stat"><div class="stat-lbl">調査済</div><div class="stat-num" id="stSurveyed">—</div><div class="stat-sub">ステータス確認済</div></div>
     </div>
 
@@ -701,25 +701,31 @@ async function getThumbUrl(f) {
     thumbCache.set(f.Title, url);
     return url;
   } catch(e) {
-    console.warn('サムネ取得失敗', f.Title, e.message);
-    thumbCache.set(f.Title, null);
-    return null;
+    console.warn('サムネ取得失敗（次回再試行します）', f.Title, e.message);
+    return null; // キャッシュしない＝次回のhydrateThumbsで再試行される
   }
 }
 
 // 表示中のカードに非同期でサムネを反映（一覧描画をブロックしない）
+function applyThumbToCards(title, url) {
+  document.querySelectorAll(`[data-thumb-for="${CSS.escape(title)}"]`).forEach(el => {
+    el.style.backgroundImage = `url("${url}")`;
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+    el.classList.add('has-img');
+  });
+}
+
 function hydrateThumbs(list) {
   list.forEach(f => {
-    if (!f.boxFolderId || thumbCache.has(f.Title)) return;
-    getThumbUrl(f).then(url => {
-      if (!url) return;
-      document.querySelectorAll(`[data-thumb-for="${CSS.escape(f.Title)}"]`).forEach(el => {
-        el.style.backgroundImage = `url("${url}")`;
-        el.style.backgroundSize = 'cover';
-        el.style.backgroundPosition = 'center';
-        el.classList.add('has-img');
-      });
-    });
+    if (!f.boxFolderId) return;
+    if (thumbCache.has(f.Title)) {
+      // 再描画（フィルタ切替・表示切替）で新規DOMになった分にキャッシュ済み画像を即反映
+      const cached = thumbCache.get(f.Title);
+      if (cached) applyThumbToCards(f.Title, cached);
+      return;
+    }
+    getThumbUrl(f).then(url => { if (url) applyThumbToCards(f.Title, url); });
   });
 }
 
@@ -801,8 +807,6 @@ async function loadPhotoStripForFacility(f) {
    データ整形・描画
 ══════════════════════════════════════════ */
 const TAG_MAP = {
-  TagUD: {label:'UD対応', cls:'tud'},
-  TagBF: {label:'BF対応', cls:'tbf'},
   TagDaremo: {label:'だれでもトイレ', cls:'tal'},
   TagOyako: {label:'親子トイレ', cls:'tfm'},
   TagOstomy: {label:'オストメイト', cls:'tal'},
@@ -849,8 +853,6 @@ async function loadData() {
       const keys = (toilets || []).flatMap(t => Object.keys(t.counts || {}));
       const has = kwList => keys.some(k => kwList.some(kw => k.includes(kw)));
       return {
-        TagUD: toilets && toilets.length > 0,
-        TagBF: toilets && toilets.length > 0,
         TagDaremo: has(TAG_KEYWORDS.TagDaremo),
         TagOyako:  has(TAG_KEYWORDS.TagOyako),
         TagOstomy: has(TAG_KEYWORDS.TagOstomy),
@@ -865,8 +867,6 @@ async function loadData() {
       const manual = f.bfud || {};
       const auto = deriveTagsFromToilets(f.toilets);
       DB.bfud[f.Title] = {
-        TagUD:      !!manual.TagUD      || auto.TagUD,
-        TagBF:      !!manual.TagBF      || auto.TagBF,
         TagDaremo:  !!manual.TagDaremo  || auto.TagDaremo,
         TagOyako:   !!manual.TagOyako   || auto.TagOyako,
         TagOstomy:  !!manual.TagOstomy  || auto.TagOstomy,
@@ -881,12 +881,12 @@ async function loadData() {
     // 統計
     const total = DB.facilities.length;
     const daremo = DB.facilities.filter(f => DB.bfud[f.Title]?.TagDaremo).length;
-    const bf = DB.facilities.filter(f => DB.bfud[f.Title]?.TagBF).length;
+    const ostomy = DB.facilities.filter(f => DB.bfud[f.Title]?.TagOstomy).length;
     const surveyed = DB.facilities.filter(f => DB.survey[f.Title]?.Status === '調査済').length;
 
     document.getElementById('stTotal').textContent = total;
     document.getElementById('stDaremo').textContent = daremo;
-    document.getElementById('stBF').textContent = bf;
+    document.getElementById('stBF').textContent = ostomy;
     document.getElementById('stSurveyed').textContent = surveyed;
     document.getElementById('stSub').textContent = `登録件数`;
     document.getElementById('nbTotal').textContent = total;
@@ -934,7 +934,7 @@ function applyFilter() {
     if (currentFilter === 'all') return true;
     const bf = DB.bfud[f.Title];
     if (!bf) return false;
-    const map = { ud:'TagUD', bf:'TagBF', daremo:'TagDaremo', oyako:'TagOyako', ostomy:'TagOstomy', lgbtq:'TagLGBTQ' };
+    const map = { daremo:'TagDaremo', oyako:'TagOyako', ostomy:'TagOstomy', lgbtq:'TagLGBTQ' };
     return !!bf[map[currentFilter]];
   });
 
@@ -952,6 +952,20 @@ function buildTags(code) {
     .filter(([k]) => bf[k])
     .map(([,v]) => `<span class="tag ${v.cls}">${v.label}</span>`)
     .join('');
+}
+
+// 便器数合計サマリー（例: 便器数 計112基 / 多機能4）
+function buildToiletSummary(f) {
+  const toilets = f.toilets || [];
+  if (!toilets.length) return '';
+  const totals = {};
+  let sum = 0;
+  toilets.forEach(t => Object.entries(t.counts || {}).forEach(([k, v]) => {
+    totals[k] = (totals[k] || 0) + v;
+    sum += v;
+  }));
+  const multi = totals['多機能'] || 0;
+  return `便器数 計${sum}基${multi ? ` ・ 多機能${multi}` : ''}`;
 }
 
 function buildTagsOverlay(code) {
@@ -980,7 +994,7 @@ function renderGallery() {
     const photoCnt = sv.PhotoCount || 0;
     const hasPhoto = photoCnt > 0;
     const tagsOv = buildTagsOverlay(f.Title);
-    const tags = buildTags(f.Title);
+    const toiletSummary = buildToiletSummary(f);
     const year = f.CompletionDate || null;
     const metaYear = year ? `${year}年竣工` : `<span class="unknown">竣工年不明</span>`;
     const addr = f.Address || '';
@@ -1003,7 +1017,7 @@ function renderGallery() {
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
           ${escHtml(addr)} · ${metaYear}
         </div>
-        <div class="gtl">${tags || '<span class="unknown" style="font-size:10px">タグ未登録</span>'}</div>
+        <div class="gtl">${toiletSummary || '<span class="unknown" style="font-size:10px">トイレ数未登録</span>'}</div>
       </div>
     </div>`;
   }).join('');
