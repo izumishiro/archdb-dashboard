@@ -118,6 +118,8 @@ input{font-family:inherit;color:inherit}
 .fc{padding:4px 11px;border-radius:var(--rp);font-size:11px;border:1px solid var(--s2);background:var(--s0);color:var(--t2);cursor:pointer;transition:all var(--ease)}
 .fc:hover{border-color:var(--s3);color:var(--t1)}
 .fc.on{background:var(--t1);color:var(--bg);border-color:var(--t1);font-weight:500}
+.fc-badge{font-size:9px;opacity:.65;margin-left:2px}
+.fc.on .fc-badge{opacity:.85}
 .sec-ct{font-size:10px;color:var(--t3);margin-left:auto}
 
 /* ── GALLERY ── */
@@ -135,7 +137,9 @@ input{font-family:inherit;color:inherit}
 .gname{font-size:12.5px;font-weight:500;color:var(--t1);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gmeta{font-size:10.5px;color:var(--t3);display:flex;align-items:center;gap:5px;margin-bottom:8px}
 .gmeta svg{width:10px;height:10px;stroke:currentColor;flex-shrink:0}
-.gtl{font-size:11px;color:var(--t3)}
+.gtl{font-size:11px;color:var(--t3);display:flex;flex-wrap:wrap;gap:0}
+.gtl-item{white-space:nowrap}
+.gtl-item:not(:last-child)::after{content:'・';color:var(--t3)}
 
 /* ── TAGS ── */
 .tag{font-size:9.5px;padding:2px 7px;border-radius:var(--rp);font-weight:500;white-space:nowrap}
@@ -335,13 +339,7 @@ tr:hover td{background:var(--hi)}
       <button class="api-banner-btn" onclick="openConfig()">設定する</button>
     </div>
 
-    <!-- STATS -->
-    <div class="stats">
-      <div class="stat"><div class="stat-lbl">総登録件数</div><div class="stat-num" id="stTotal">—</div><div class="stat-sub" id="stSub">読込中…</div></div>
-      <div class="stat"><div class="stat-lbl">だれでもトイレ</div><div class="stat-num" id="stDaremo">—</div><div class="stat-sub">登録件数</div></div>
-      <div class="stat"><div class="stat-lbl">オストメイト対応</div><div class="stat-num" id="stBF">—</div><div class="stat-sub">登録件数</div></div>
-      <div class="stat"><div class="stat-lbl">調査済</div><div class="stat-num" id="stSurveyed">—</div><div class="stat-sub">ステータス確認済</div></div>
-    </div>
+    <!-- STATS: 案B採用のため撤去。件数は絞り込みチップのバッジに統合 -->
 
     <!-- CONTROLS -->
     <div class="ctrl-row">
@@ -356,13 +354,11 @@ tr:hover td{background:var(--hi)}
         </div>
       </div>
       <div class="fchips" id="filterChips">
-        <div class="fc on" onclick="setFilter(this,'all')">すべて</div>
-        <div class="fc" onclick="setFilter(this,'ud')">UD</div>
-        <div class="fc" onclick="setFilter(this,'bf')">BF</div>
-        <div class="fc" onclick="setFilter(this,'daremo')">だれでも</div>
-        <div class="fc" onclick="setFilter(this,'oyako')">親子</div>
-        <div class="fc" onclick="setFilter(this,'ostomy')">オストメイト</div>
-        <div class="fc" onclick="setFilter(this,'lgbtq')">LGBTQ</div>
+        <div class="fc on" onclick="setFilter(this,'all')">すべて <span class="fc-badge" id="fcAll">—</span></div>
+        <div class="fc" onclick="setFilter(this,'daremo')">だれでも <span class="fc-badge" id="fcDaremo">—</span></div>
+        <div class="fc" onclick="setFilter(this,'oyako')">親子 <span class="fc-badge" id="fcOyako">—</span></div>
+        <div class="fc" onclick="setFilter(this,'ostomy')">オストメイト <span class="fc-badge" id="fcOstomy">—</span></div>
+        <div class="fc" onclick="setFilter(this,'lgbtq')">LGBTQ <span class="fc-badge" id="fcLgbtq">—</span></div>
       </div>
       <div class="sec-ct" id="dispCount">— 件</div>
     </div>
@@ -878,17 +874,18 @@ async function loadData() {
     DB.facilities = list;
     DB.meta = { version: json.version || '', updatedAt: json.updatedAt || '' };
 
-    // 統計
+    // 件数集計（絞り込みチップのバッジに反映。UD・BFは撤去済のため対象外）
     const total = DB.facilities.length;
     const daremo = DB.facilities.filter(f => DB.bfud[f.Title]?.TagDaremo).length;
+    const oyako  = DB.facilities.filter(f => DB.bfud[f.Title]?.TagOyako).length;
     const ostomy = DB.facilities.filter(f => DB.bfud[f.Title]?.TagOstomy).length;
-    const surveyed = DB.facilities.filter(f => DB.survey[f.Title]?.Status === '調査済').length;
+    const lgbtq  = DB.facilities.filter(f => DB.bfud[f.Title]?.TagLGBTQ).length;
 
-    document.getElementById('stTotal').textContent = total;
-    document.getElementById('stDaremo').textContent = daremo;
-    document.getElementById('stBF').textContent = ostomy;
-    document.getElementById('stSurveyed').textContent = surveyed;
-    document.getElementById('stSub').textContent = `登録件数`;
+    document.getElementById('fcAll').textContent = total;
+    document.getElementById('fcDaremo').textContent = daremo;
+    document.getElementById('fcOyako').textContent = oyako;
+    document.getElementById('fcOstomy').textContent = ostomy;
+    document.getElementById('fcLgbtq').textContent = lgbtq;
     document.getElementById('nbTotal').textContent = total;
 
     // フィルタ適用して描画
@@ -954,7 +951,7 @@ function buildTags(code) {
     .join('');
 }
 
-// 便器数内訳（合計に束ねず、区分ごとの数量をそのまま表示。例: 男子大20・女子56・多機能2）
+// 便器数内訳（合計に束ねず、区分ごとの数量をそのまま表示。項目単位で改行されるよう各項目を折返し不可にする）
 function buildToiletSummary(f) {
   const toilets = f.toilets || [];
   if (!toilets.length) return '';
@@ -962,7 +959,7 @@ function buildToiletSummary(f) {
   toilets.forEach(t => Object.entries(t.counts || {}).forEach(([k, v]) => {
     totals[k] = (totals[k] || 0) + v;
   }));
-  return Object.entries(totals).map(([k, v]) => `${k}${v}`).join('・');
+  return Object.entries(totals).map(([k, v]) => `<span class="gtl-item">${escHtml(k)}${v}</span>`).join('');
 }
 
 function buildTagsOverlay(code) {
