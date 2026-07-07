@@ -1132,13 +1132,14 @@ async function getMasterFolderId() {
 
 async function fetchDbJson() {
   let fileId = await findDbFileId();
+  const bust = `?t=${Date.now()}`; // ブラウザ/CDNキャッシュを回避し、常に最新版を取得する
   try {
-    return await (await boxFetch(`https://api.box.com/2.0/files/${fileId}/content`)).json();
+    return await (await boxFetch(`https://api.box.com/2.0/files/${fileId}/content${bust}`, { cache: 'no-store' })).json();
   } catch(e) {
     // キャッシュIDが無効化された場合は再探索して1回だけリトライ
     localStorage.removeItem(CACHE_KEY);
     fileId = await findDbFileId();
-    return await (await boxFetch(`https://api.box.com/2.0/files/${fileId}/content`)).json();
+    return await (await boxFetch(`https://api.box.com/2.0/files/${fileId}/content${bust}`, { cache: 'no-store' })).json();
   }
 }
 
