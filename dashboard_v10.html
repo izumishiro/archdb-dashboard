@@ -235,6 +235,12 @@ tr:hover td{background:var(--hi)}
 .dp-sthumb.active{border-color:var(--acc)}
 .dp-sthumb:not(.loaded)::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,var(--s1),var(--s1) 4px,var(--s2) 4px,var(--s2) 8px)}
 .dp-strip-more{flex:0 0 auto;width:64px;height:64px;border-radius:6px;background:var(--s2);color:var(--t3);font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;text-align:center;line-height:1.3}
+.dp-toilet-loc{margin-bottom:10px}
+.dp-toilet-loc:last-child{margin-bottom:0}
+.dp-toilet-loc-name{font-size:11px;font-weight:500;color:var(--t2);margin-bottom:5px}
+.dp-toilet-counts{display:flex;flex-wrap:wrap;gap:6px}
+.dp-toilet-chip{font-size:11px;background:var(--s1);border:1px solid var(--s2);border-radius:6px;padding:4px 9px;color:var(--t1);display:flex;align-items:center;gap:5px}
+.dp-toilet-chip b{color:var(--acc);font-weight:600}
 .dp-sec{padding:14px 16px;border-bottom:1px solid var(--s2)}
 .dp-sec:last-child{border-bottom:none;padding-bottom:20px}
 .dp-sec-ttl{font-size:9.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
@@ -470,6 +476,10 @@ tr:hover td{background:var(--hi)}
     <div class="dp-sec">
       <div class="dp-sec-ttl">BF・UD 分類</div>
       <div class="dp-tags" id="dp-tags">—</div>
+    </div>
+    <div class="dp-sec" id="dp-toilet-sec" style="display:none">
+      <div class="dp-sec-ttl">トイレ設備</div>
+      <div id="dp-toilet"></div>
     </div>
     <div class="dp-sec">
       <div class="dp-sec-ttl">調査情報</div>
@@ -1043,6 +1053,23 @@ function openDetail(code) {
     .map(([,v]) => `<span class="tag ${v.cls}">${v.label}</span>`)
     .join('');
   document.getElementById('dp-tags').innerHTML = tagHtml || '<span class="unknown">タグ未登録</span>';
+
+  // トイレ設備（複数拠点対応・数量チップ表示）
+  const toiletSec = document.getElementById('dp-toilet-sec');
+  const toilets = f.toilets || [];
+  if (toilets.length) {
+    toiletSec.style.display = 'block';
+    document.getElementById('dp-toilet').innerHTML = toilets.map(t => `
+      <div class="dp-toilet-loc">
+        <div class="dp-toilet-loc-name">${escHtml(t.location || '')}</div>
+        <div class="dp-toilet-counts">${
+          Object.entries(t.counts || {}).map(([k, v]) => `<span class="dp-toilet-chip">${escHtml(k)}<b>${v}</b></span>`).join('')
+          || '<span class="unknown">数量未登録</span>'
+        }</div>
+      </div>`).join('');
+  } else {
+    toiletSec.style.display = 'none';
+  }
 
   // Box リンク（施設フォルダIDがdb.jsonにあれば直接、なければDBルート）
   document.getElementById('dp-sp-link').onclick = () => {
