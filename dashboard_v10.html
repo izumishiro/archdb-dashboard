@@ -157,8 +157,8 @@ input{font-family:inherit;color:inherit}
 .gcnt{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.35);backdrop-filter:blur(6px);color:rgba(255,255,255,.85);font-size:9px;padding:2px 7px;border-radius:var(--rp);display:flex;align-items:center;gap:3px}
 .gcnt svg{width:9px;height:9px;stroke:currentColor}
 .gtags-ov{position:absolute;bottom:8px;left:8px;display:flex;gap:3px}
-.gcmp{position:absolute;top:8px;left:8px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.88);border:1.5px solid rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background var(--ease),border-color var(--ease)}
-.gcmp svg{width:12px;height:12px;stroke:#fff;opacity:0;transition:opacity var(--ease)}
+.gcmp{position:absolute;top:8px;left:8px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.35);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background var(--ease),border-color var(--ease)}
+.gcmp svg{width:9px;height:9px;stroke:#fff;opacity:0;transition:opacity var(--ease)}
 .gcmp:hover{border-color:var(--primary)}
 .gcmp.on{background:var(--primary);border-color:var(--primary)}
 .gcmp.on svg{opacity:1}
@@ -338,23 +338,26 @@ tr:hover td{background:var(--hi)}
 .cmp-head-ttl{font-size:14px;font-weight:500;color:var(--acc-t)}
 .cmp-head-sub{font-size:11px;color:var(--acc-sub)}
 .cmp-body{flex:1;overflow:auto;padding:20px}
-.cmp-table{border-collapse:separate;border-spacing:0;font-size:12px;background:var(--s0)}
+.cmp-table{border-collapse:separate;border-spacing:0;font-size:12px;background:var(--s0);table-layout:fixed;width:100%}
 .cmp-table th, .cmp-table td{border:1px solid var(--s2);padding:8px 12px;text-align:left;white-space:nowrap;vertical-align:top}
 .cmp-table td.cmp-multiline{white-space:normal;max-width:220px}
 .cmp-row-lbl{position:sticky;background:var(--s1);font-weight:500;color:var(--t2);z-index:2}
-.cmp-major-lbl{left:0;min-width:96px;text-align:center;vertical-align:middle;font-weight:600;color:var(--t1);background:var(--s2);z-index:3}
-.cmp-minor-lbl{left:96px;min-width:110px;background:var(--s1)}
-.cmp-col-head{min-width:190px;background:var(--s0);vertical-align:top}
-.cmp-col-name{font-size:13.5px;font-weight:700;color:var(--t1);margin-bottom:8px;display:flex;align-items:baseline;gap:6px;white-space:normal}
+.cmp-major-lbl{left:0;width:96px;text-align:center;vertical-align:middle;font-weight:600;color:var(--t1);background:var(--s2);z-index:3}
+.cmp-minor-lbl{left:96px;width:110px;background:var(--s1);text-align:center}
+.cmp-col-head{width:190px;background:var(--s0);vertical-align:top;text-align:center}
+.cmp-col-name{font-size:13.5px;font-weight:700;color:var(--t1);margin-bottom:8px;display:flex;align-items:baseline;justify-content:center;gap:6px;white-space:normal}
 .cmp-letter{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:var(--primary);color:#fff;font-size:10.5px;font-weight:700;flex-shrink:0}
 .cmp-col-photos{display:flex;gap:6px}
 .cmp-photo-box{flex:1;min-width:0}
-.cmp-photo{width:100%;height:100px;background-size:cover;background-position:center;border-radius:var(--r2);background-color:#D8D8DC}
+.cmp-photo{width:100%;height:100px;background-size:contain;background-repeat:no-repeat;background-position:center;border-radius:var(--r2);background-color:#D8D8DC}
 [data-theme="dark"] .cmp-photo{background-color:var(--s2)}
-.cmp-drawing{background-size:contain;background-repeat:no-repeat;background-color:var(--s1)}
 .cmp-tagchips{display:flex;flex-wrap:wrap;gap:3px}
+.cmp-shade{background:var(--hi)}
+.cmp-major-lbl.cmp-shade{background:var(--s3)}
+.cmp-minor-lbl.cmp-shade{background:var(--hi)}
 .cmp-editable{background:var(--primary-hi);cursor:text}
 .cmp-editable:focus{outline:2px solid var(--primary);outline-offset:-2px}
+.cmp-remarks-cell{font-size:11px;line-height:1.6;white-space:pre-wrap;min-width:180px}
 .cmp-foot{font-size:10px;color:var(--t3);line-height:1.7;padding:12px 0 0}
 @media print {
   body *{visibility:hidden}
@@ -1572,22 +1575,28 @@ function cmpRowHtml(label, htmlCells) {
   return `<tr><td class="cmp-row-lbl">${escHtml(label)}</td>${htmlCells.map(c => `<td class="cmp-multiline">${c}</td>`).join('')}</tr>`;
 }
 
+let cmpShadeToggle = false; // 大分類ごとに交互で陰影をつけるためのトグル
+
 function cmpRowGroup(majorLabel, subRows) {
   // subRows: [{minor, cells: [htmlString...], editableField?, facilityTitles?}]
+  const shade = (cmpShadeToggle = !cmpShadeToggle);
   return subRows.map((sr, i) => {
+    const topBorder = i === 0 ? ' style="border-top:2px solid var(--t2)"' : '';
     const labelCell = i === 0
-      ? `<td class="cmp-row-lbl cmp-major-lbl" rowspan="${subRows.length}">${escHtml(majorLabel)}</td>`
+      ? `<td class="cmp-row-lbl cmp-major-lbl${shade ? ' cmp-shade' : ''}" rowspan="${subRows.length}"${topBorder}>${escHtml(majorLabel)}</td>`
       : '';
     const cells = sr.cells.map((c, ci) => {
       const editAttr = sr.editableField ? ` contenteditable="true" data-title="${escHtml(sr.facilityTitles[ci])}" data-field="${sr.editableField}"` : '';
-      return `<td class="cmp-multiline${sr.editableField ? ' cmp-editable' : ''}"${editAttr}>${c}</td>`;
+      const remarksCls = sr.editableField ? ' cmp-remarks-cell' : '';
+      return `<td class="cmp-multiline${sr.editableField ? ' cmp-editable' : ''}${remarksCls}${shade ? ' cmp-shade' : ''}"${editAttr}${topBorder}>${c}</td>`;
     }).join('');
-    return `<tr>${labelCell}<td class="cmp-row-lbl cmp-minor-lbl">${escHtml(sr.minor)}</td>${cells}</tr>`;
+    return `<tr>${labelCell}<td class="cmp-row-lbl cmp-minor-lbl${shade ? ' cmp-shade' : ''}"${topBorder}>${escHtml(sr.minor)}</td>${cells}</tr>`;
   }).join('');
 }
 
 function openCompareView() {
   if (compareSet.size < 2) { alert('比較には2件以上選択してください'); return; }
+  cmpShadeToggle = false;
   const facilities = Array.from(compareSet).map(t => DB.facilities.find(f => f.Title === t)).filter(Boolean);
   document.getElementById('cmpCount').textContent = `${facilities.length}件`;
   const letters = facilities.map((f, i) => String.fromCharCode(65 + i));
@@ -1736,7 +1745,7 @@ async function saveCompareEdits() {
     cells.forEach(cell => {
       const title = cell.dataset.title;
       const field = cell.dataset.field; // 'survey.Remarks' or 'Remarks'
-      const val = cell.textContent.trim();
+      const val = (cell.innerText || cell.textContent).trim();
       const f = (json.facilities || []).find(x => x.Title === title);
       if (!f) return;
       const parts = field.split('.');
