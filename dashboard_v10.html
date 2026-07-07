@@ -339,26 +339,36 @@ tr:hover td{background:var(--hi)}
 .cmp-head-sub{font-size:11px;color:var(--acc-sub)}
 .cmp-body{flex:1;overflow:auto;padding:20px}
 .cmp-table{border-collapse:separate;border-spacing:0;font-size:12px;background:var(--s0);table-layout:fixed;width:100%}
-.cmp-table th, .cmp-table td{border:1px solid var(--s2);padding:8px 12px;text-align:left;white-space:nowrap;vertical-align:top}
+.cmp-table th, .cmp-table td{border:1px solid var(--s3);padding:8px 12px;text-align:left;white-space:nowrap;vertical-align:top}
 .cmp-table td.cmp-multiline{white-space:normal;max-width:220px}
-.cmp-row-lbl{position:sticky;background:var(--s1);font-weight:500;color:var(--t2);z-index:2}
-.cmp-major-lbl{left:0;width:96px;text-align:center;vertical-align:middle;font-weight:600;color:var(--t1);background:var(--s2);z-index:3}
-.cmp-minor-lbl{left:96px;width:110px;background:var(--s1);text-align:center;vertical-align:middle}
-.cmp-col-head{width:190px;background:var(--s2);vertical-align:middle;text-align:center}
-.cmp-col-name{font-size:13.5px;font-weight:700;color:var(--t1);margin-bottom:8px;display:flex;align-items:baseline;justify-content:center;gap:6px;white-space:normal}
+
+/* ラベル列（大分類・中分類）：sticky+vertical-align併用は縦中央がずれるため、内側flexで中央寄せする */
+.cmp-row-lbl{position:sticky;background:var(--s1);font-weight:500;color:var(--t2);z-index:2;height:1px;padding:0}
+.cmp-major-lbl{left:0;width:96px;font-weight:600;color:var(--t1);background:var(--s2);z-index:3}
+.cmp-minor-lbl{left:96px;width:110px;background:var(--s1);border-right:1.5px solid var(--t1)}
+.cmp-lbl-merged{left:0;width:206px;background:var(--s2);border-right:1.5px solid var(--t1)}
+.cmp-lbl-inner{display:flex;align-items:center;justify-content:center;height:100%;min-height:32px;padding:8px 10px;box-sizing:border-box;text-align:center}
+
+/* 施設名行（項目バー）：サムネイル行と濃淡を分けて明確に区分 */
+.cmp-row-name .cmp-lbl-merged, .cmp-row-name .cmp-name-cell{background:var(--s2)}
+.cmp-name-cell{width:190px;vertical-align:middle;text-align:center;padding:10px 12px}
+.cmp-col-name{font-size:13.5px;font-weight:700;color:var(--t1);display:flex;align-items:center;justify-content:center;gap:6px;white-space:normal}
 .cmp-letter{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:var(--primary);color:#fff;font-size:10.5px;font-weight:700;flex-shrink:0}
-.cmp-col-photos{display:flex;gap:6px}
-.cmp-photo-box{flex:1;min-width:0}
-.cmp-photo{width:100%;height:100px;background-size:contain;background-repeat:no-repeat;background-position:center;border-radius:0;background-color:#C4C4C8}
-[data-theme="dark"] .cmp-photo{background-color:#111113}
+
+/* サムネイル・平面図行：セル自体に色を敷き、画像は上に重ねるだけ（色の二重掛けを避ける） */
+.cmp-row-thumb .cmp-lbl-merged{background:var(--s1)}
+.cmp-photo-cell{width:190px;height:110px;padding:0;background-size:contain;background-repeat:no-repeat;background-position:center;background-color:#C4C4C8}
+[data-theme="dark"] .cmp-photo-cell{background-color:#111113}
+
 .cmp-tagchips{display:flex;flex-wrap:wrap;gap:3px}
 .cmp-shade{background:var(--hi)}
 .cmp-major-lbl.cmp-shade{background:var(--s3)}
 .cmp-minor-lbl.cmp-shade{background:var(--hi)}
-/* 境界線：細=中分類内の既定グリッド／中幅=大分類の区切り／太幅=書式(項目名・見出し)とデータの区切り */
+
+/* 境界線ポリシー：細=既定グリッド（s3。ダークでも視認できる濃さ）／中=大分類の区切り（t3）／太=書式とデータの区切り（t1） */
 .cmp-group-start{border-top:1px solid var(--t3)}
-.cmp-minor-lbl{border-right:1.5px solid var(--t1)}
-thead .cmp-major-lbl, thead .cmp-minor-lbl, thead .cmp-col-head{border-bottom:1.5px solid var(--t1)}
+.cmp-row-thumb:last-of-type td{border-bottom:1.5px solid var(--t1)}
+
 .cmp-editable{background:var(--primary-hi);cursor:text}
 .cmp-editable:focus{outline:2px solid var(--primary);outline-offset:-2px}
 .cmp-remarks-cell{font-size:11px;line-height:1.6;white-space:pre-wrap;min-width:180px}
@@ -1587,14 +1597,14 @@ function cmpRowGroup(majorLabel, subRows) {
   return subRows.map((sr, i) => {
     const groupStart = i === 0 ? ' cmp-group-start' : '';
     const labelCell = i === 0
-      ? `<td class="cmp-row-lbl cmp-major-lbl${shade ? ' cmp-shade' : ''}${groupStart}" rowspan="${subRows.length}">${escHtml(majorLabel)}</td>`
+      ? `<td class="cmp-row-lbl cmp-major-lbl${shade ? ' cmp-shade' : ''}${groupStart}" rowspan="${subRows.length}"><div class="cmp-lbl-inner">${escHtml(majorLabel)}</div></td>`
       : '';
     const cells = sr.cells.map((c, ci) => {
       const editAttr = sr.editableField ? ` contenteditable="true" data-title="${escHtml(sr.facilityTitles[ci])}" data-field="${sr.editableField}"` : '';
       const remarksCls = sr.editableField ? ' cmp-remarks-cell' : '';
       return `<td class="cmp-multiline${sr.editableField ? ' cmp-editable' : ''}${remarksCls}${shade ? ' cmp-shade' : ''}${groupStart}"${editAttr}>${c}</td>`;
     }).join('');
-    return `<tr>${labelCell}<td class="cmp-row-lbl cmp-minor-lbl${shade ? ' cmp-shade' : ''}${groupStart}">${escHtml(sr.minor)}</td>${cells}</tr>`;
+    return `<tr>${labelCell}<td class="cmp-row-lbl cmp-minor-lbl${shade ? ' cmp-shade' : ''}${groupStart}"><div class="cmp-lbl-inner">${escHtml(sr.minor)}</div></td>${cells}</tr>`;
   }).join('');
 }
 
@@ -1635,21 +1645,29 @@ function openCompareView() {
     return hasWashiki ? `${total}<small style="color:var(--t3)">(内和式${washiki})</small>` : `${total}`;
   }
 
-  // ヘッダー：比較記号（A/B/C…）＋施設名（濃色・番号非表示）＋サムネ＋平面図
-  let html = `<table class="cmp-table"><thead><tr><td class="cmp-row-lbl cmp-major-lbl"></td><td class="cmp-row-lbl cmp-minor-lbl">項目</td>`;
+  // ヘッダー：①施設名行（項目バー）②サムネイル行 に明確分離。左側は大分類・中分類幅を結合
+  let html = `<table class="cmp-table"><thead>`;
+  html += `<tr class="cmp-row-name"><td class="cmp-row-lbl cmp-lbl-merged" colspan="2"><div class="cmp-lbl-inner">項目</div></td>`;
+  html += facilities.map((f, i) => `<td class="cmp-col-head cmp-name-cell">
+      <div class="cmp-col-name"><span class="cmp-letter">${letters[i]}</span>${escHtml(f.FacilityName || f.Title)}</div>
+    </td>`).join('');
+  html += `</tr>`;
+  html += `<tr class="cmp-row-thumb"><td class="cmp-row-lbl cmp-lbl-merged" colspan="2"><div class="cmp-lbl-inner">サムネイル</div></td>`;
   html += facilities.map((f, i) => {
     const cached = thumbCache.get(f.Title);
-    const photoBox = `<div class="cmp-photo-box">${cached ? `<div class="cmp-photo" style="background-image:url('${cached}')" data-photo-for="${escHtml(f.Title)}"></div>` : `<div class="cmp-photo" data-photo-for="${escHtml(f.Title)}"></div>`}</div>`;
-    let drawBox = '';
-    if (f.drawingFileId) {
-      drawBox = `<div class="cmp-photo-box cmp-drawing-box"><div class="cmp-photo cmp-drawing" data-drawing-for="${escHtml(f.Title)}"></div></div>`;
-    }
-    return `<th class="cmp-col-head">
-      <div class="cmp-col-name"><span class="cmp-letter">${letters[i]}</span>${escHtml(f.FacilityName || f.Title)}</div>
-      <div class="cmp-col-photos">${photoBox}${drawBox}</div>
-    </th>`;
+    const photoBox = `<td class="cmp-photo-cell" data-photo-for="${escHtml(f.Title)}"${cached ? ` style="background-image:url('${cached}')"` : ''}></td>`;
+    return photoBox;
   }).join('');
-  html += `</tr></thead><tbody>`;
+  html += `</tr>`;
+  if (facilities.some(f => f.drawingFileId)) {
+    html += `<tr class="cmp-row-thumb"><td class="cmp-row-lbl cmp-lbl-merged" colspan="2"><div class="cmp-lbl-inner">平面図</div></td>`;
+    html += facilities.map(f => f.drawingFileId
+      ? `<td class="cmp-photo-cell cmp-drawing-cell" data-drawing-for="${escHtml(f.Title)}"></td>`
+      : `<td class="cmp-photo-cell cmp-drawing-cell"></td>`
+    ).join('');
+    html += `</tr>`;
+  }
+  html += `</thead><tbody>`;
 
   // 基本情報
   html += cmpRowGroup('基本情報', [
