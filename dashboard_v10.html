@@ -154,10 +154,11 @@ input{font-family:inherit;color:inherit}
 .gname{font-size:12.5px;font-weight:500;color:var(--t1);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gmeta{font-size:10.5px;color:var(--t3);display:flex;align-items:center;gap:5px;margin-bottom:8px}
 .gmeta svg{width:10px;height:10px;stroke:currentColor;flex-shrink:0}
-.gtl{font-size:11px;color:var(--t3);display:flex;flex-wrap:wrap;gap:0}
+.gtl{font-size:11px;color:var(--t3);display:flex;flex-direction:column;gap:2px}
+.gtl-row{display:flex;align-items:baseline;gap:0}
+.gtl-row-items{display:flex;flex-wrap:wrap;gap:0}
 .gtl-item{white-space:nowrap}
-.gtl-major{font-weight:600;color:var(--t2);white-space:nowrap;margin-right:1px}
-.gtl-major:not(:first-child){margin-left:6px}
+.gtl-major{font-weight:600;color:var(--t2);white-space:nowrap;flex:0 0 34px}
 .gtl-major::after{content:'：'}
 .gtl-item:not(:last-child)::after{content:'・';color:var(--t3)}
 
@@ -728,7 +729,7 @@ function closeConfig() {
    新規登録モーダル
 ══════════════════════════════════════════ */
 // 大分類・中分類の定義（比較表作成時にも同じ構造を使用する）
-const TOILET_MAJOR_CATS = ['男子', '女子', '共用'];
+const TOILET_MAJOR_CATS = ['共用', '男子', '女子'];
 const TOILET_MINOR_CATS = {
   '男子': ['大便器', '小便器', '洗面', 'オストメイト', 'パウダー'],
   '女子': ['大便器', '洗面', 'オストメイト', 'パウダー'],
@@ -1624,7 +1625,7 @@ function buildToiletSummary(f) {
       const txt = o.hasWashiki ? `${minor}${o.value}(内和式${o.washiki})` : `${minor}${o.value}`;
       return `<span class="gtl-item">${escHtml(txt)}</span>`;
     }).join('');
-    return `<span class="gtl-major">${escHtml(major)}</span>${items}`;
+    return `<div class="gtl-row"><span class="gtl-major">${escHtml(major)}</span><span class="gtl-row-items">${items}</span></div>`;
   }).join('');
 }
 
