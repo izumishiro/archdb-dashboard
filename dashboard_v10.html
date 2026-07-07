@@ -44,41 +44,49 @@ html{font-size:13px}
 body{font-family:var(--f);background:var(--bg);color:var(--t1);height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased;transition:background var(--ease),color var(--ease)}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 input{font-family:inherit;color:inherit}
-.shell{display:flex;height:100vh;overflow:hidden}
+.shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
 
-/* ── SIDEBAR ── */
-.sidebar{width:208px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--s2);display:flex;flex-direction:column;transition:background var(--ease)}
-.sb-head{padding:20px 16px 16px;border-bottom:1px solid var(--acc-line)}
-.sb-org{font-size:9.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--acc-sub);margin-bottom:4px}
-.sb-title{font-size:15px;font-weight:500;color:var(--acc-t);letter-spacing:-.025em;line-height:1.2}
-.sb-title small{display:block;font-size:11px;font-weight:300;color:var(--acc-sub);letter-spacing:0;margin-top:2px}
-.nav-sec{font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--acc-sub);padding:16px 16px 4px;opacity:.7}
-.nav-item{display:flex;align-items:center;gap:9px;padding:8px 16px;font-size:12.5px;color:var(--acc-sub);border-left:1.5px solid transparent;cursor:pointer;transition:background var(--ease),color var(--ease)}
+/* ── 固定タイトルバー（最上段） ── */
+.topbar-main{height:52px;flex-shrink:0;background:var(--acc);border-bottom:1px solid var(--acc-deep);display:flex;align-items:center;gap:10px;padding:0 16px;transition:background var(--ease)}
+.sb-toggle-btn{width:30px;height:30px;border-radius:var(--r2);background:none;border:none;color:var(--acc-t);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-toggle-btn:hover{background:var(--acc-hi)}
+.sb-toggle-btn svg{width:17px;height:17px;stroke:currentColor}
+.tb-title-main{font-size:14px;font-weight:500;color:var(--acc-t);letter-spacing:-.015em}
+.tb-title-main span{font-weight:300;color:var(--acc-sub);margin-left:6px}
+
+/* ── サイドバー（オフキャンバス。既定は非表示） ── */
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:220px;z-index:300;background:var(--s1);border-right:1px solid var(--s2);display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .22s cubic-bezier(.4,0,.2,1);box-shadow:var(--sh2)}
+.sidebar.open{transform:translateX(0)}
+.sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:290;opacity:0;pointer-events:none;transition:opacity .2s}
+.sidebar-backdrop.show{opacity:1;pointer-events:auto}
+.sb-head{padding:20px 16px 16px;border-bottom:1px solid var(--s2)}
+.sb-org{font-size:9.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:4px}
+.sb-title{font-size:15px;font-weight:500;color:var(--t1);letter-spacing:-.025em;line-height:1.2}
+.sb-title small{display:block;font-size:11px;font-weight:300;color:var(--t3);letter-spacing:0;margin-top:2px}
+.nav-sec{font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);padding:16px 16px 4px;opacity:.7}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 16px;font-size:12.5px;color:var(--t2);border-left:1.5px solid transparent;cursor:pointer;transition:background var(--ease),color var(--ease)}
 .nav-item svg{width:14px;height:14px;flex-shrink:0;stroke:currentColor;opacity:.7}
-.nav-item:hover{background:var(--acc-hi);color:var(--acc-t)}
+.nav-item:hover{background:var(--hi);color:var(--t1)}
 .nav-item.on{color:var(--primary);font-weight:500;border-left-color:var(--primary);background:var(--primary-hi)}
 .nav-item.on svg{opacity:1}
-.nav-badge{margin-left:auto;font-size:9px;padding:1px 6px;border-radius:var(--rp);background:var(--acc-act);color:var(--acc-t);opacity:.8}
-.sb-foot{margin-top:auto;padding:12px 16px;border-top:1px solid var(--acc-line);display:flex;align-items:center;gap:9px}
-.ava{width:26px;height:26px;border-radius:50%;background:var(--acc-act);border:1px solid var(--acc-line);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--acc-t);flex-shrink:0}
-.sb-uname{font-size:11.5px;font-weight:500;color:var(--acc-t)}
-.sb-urole{font-size:10px;color:var(--acc-sub)}
+.nav-badge{margin-left:auto;font-size:9px;padding:1px 6px;border-radius:var(--rp);background:var(--s2);color:var(--t2);opacity:.9}
+.sb-foot{margin-top:auto;padding:12px 16px;border-top:1px solid var(--s2);display:flex;align-items:center;gap:9px}
+.ava{width:26px;height:26px;border-radius:50%;background:var(--s2);border:1px solid var(--s3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--t1);flex-shrink:0}
+.sb-uname{font-size:11.5px;font-weight:500;color:var(--t1)}
+.sb-urole{font-size:10px;color:var(--t3)}
 
-/* ── MAIN / TOPBAR ── */
+/* ── MAIN ── */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{height:84px;flex-shrink:0;background:var(--acc);border-bottom:1px solid var(--acc-deep);display:flex;align-items:center;gap:8px;padding:0 18px;transition:background var(--ease)}
-.tb-title{font-size:13.5px;font-weight:500;color:var(--acc-t);flex:1;letter-spacing:-.015em}
-.tb-title span{font-weight:300;color:var(--acc-sub);font-size:11px;margin-left:9px;letter-spacing:0}
-.srch{display:flex;align-items:center;gap:6px;background:var(--acc-hi);border:1px solid var(--acc-line);border-radius:var(--rp);padding:0 11px;height:30px;width:214px;transition:border-color var(--ease)}
-.srch:focus-within{border-color:rgba(255,255,255,.4);box-shadow:0 0 0 3px var(--acc-act)}
-.srch svg{width:12px;height:12px;color:var(--acc-sub);flex-shrink:0;stroke:currentColor}
-.srch input{border:none;background:none;font-size:11.5px;color:var(--acc-t);width:100%;outline:none}
-.srch input::placeholder{color:var(--acc-sub)}
+.srch{display:flex;align-items:center;gap:6px;background:var(--s1);border:1px solid var(--s2);border-radius:var(--rp);padding:0 11px;height:30px;width:214px;transition:border-color var(--ease)}
+.srch:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-hi)}
+.srch svg{width:12px;height:12px;color:var(--t3);flex-shrink:0;stroke:currentColor}
+.srch input{border:none;background:none;font-size:11.5px;color:var(--t1);width:100%;outline:none}
+.srch input::placeholder{color:var(--t3)}
 .tw{display:flex;align-items:center;gap:5px}
-.tw svg{width:11px;height:11px;color:var(--acc-sub);stroke:currentColor}
-.tgl{width:40px;height:22px;border-radius:var(--rp);background:var(--acc-act);border:1px solid var(--acc-line);position:relative;cursor:pointer;flex-shrink:0;transition:background .22s}
+.tw svg{width:11px;height:11px;color:var(--t3);stroke:currentColor}
+.tgl{width:40px;height:22px;border-radius:var(--rp);background:var(--s2);border:1px solid var(--s3);position:relative;cursor:pointer;flex-shrink:0;transition:background .22s}
 [data-theme="dark"] .tgl{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.18)}
-.tgl-k{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--acc-t);box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .22s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:center}
+.tgl-k{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--s0);box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .22s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:center}
 [data-theme="dark"] .tgl-k{transform:translateX(18px)}
 .tgl-k svg{width:8px;height:8px}
 .ico-sun{display:block;color:#C08820}
@@ -88,10 +96,11 @@ input{font-family:inherit;color:inherit}
 .tbtn{height:30px;padding:0 13px;border-radius:var(--r2);font-size:11.5px;display:flex;align-items:center;gap:5px;transition:background var(--ease),opacity var(--ease)}
 .tbtn svg{width:11px;height:11px;stroke:currentColor}
 .tbtn:active{opacity:.75}
-.tbtn-g{background:var(--acc-hi);color:var(--acc-t);border:1px solid var(--acc-line)}
-.tbtn-g:hover{background:var(--acc-act)}
-.tbtn-s{background:var(--acc-t);color:var(--acc);font-weight:500;border:1px solid transparent}
-.tbtn-s:hover{opacity:.88}
+.tbtn-g{background:var(--s1);color:var(--t1);border:1px solid var(--s2)}
+.tbtn-g:hover{background:var(--s2)}
+.new-reg-btn{height:30px;padding:0 13px;border-radius:var(--r2);font-size:11.5px;font-weight:500;display:flex;align-items:center;gap:5px;background:var(--primary);color:#fff;border:none;cursor:pointer}
+.new-reg-btn:hover{opacity:.88}
+.new-reg-btn svg{width:12px;height:12px;stroke:currentColor}
 
 /* ── CONTENT ── */
 .content{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
@@ -108,7 +117,8 @@ input{font-family:inherit;color:inherit}
 
 /* ── CONTROLS ── */
 .ctrl-row-1{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
-.ctrl-row-2{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.ctrl-row-2{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.ctrl-row-2-right{display:flex;align-items:center;gap:8px;margin-left:auto}
 .vtabs{display:flex;gap:1px;background:var(--s1);border:1px solid var(--s2);border-radius:var(--r2);padding:2px}
 .vtab{display:flex;align-items:center;gap:4px;padding:4px 11px;font-size:11px;color:var(--t3);border-radius:calc(var(--r2) - 2px);cursor:pointer;transition:background var(--ease),color var(--ease)}
 .vtab svg{width:12px;height:12px;stroke:currentColor}
@@ -123,7 +133,8 @@ input{font-family:inherit;color:inherit}
 .sec-ct{font-size:10px;color:var(--t3);margin-left:auto}
 
 /* ── GALLERY ── */
-.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;padding:14px;border-radius:var(--r3)}
+[data-theme="light"] .gallery{background:#D8D8DC}
 .gcard{background:var(--s0);border:1px solid var(--s2);border-radius:var(--r4);overflow:hidden;box-shadow:var(--sh0);cursor:pointer;transition:box-shadow var(--ease),transform var(--ease),border-color var(--ease)}
 .gcard:hover{box-shadow:var(--sh2);transform:translateY(-2px);border-color:var(--s3)}
 .gthumb{width:100%;aspect-ratio:16/9;background:var(--s2);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--s2)}
@@ -291,8 +302,17 @@ tr:hover td{background:var(--hi)}
 <body>
 <div class="shell">
 
-<!-- ═══ SIDEBAR ═══ -->
-<aside class="sidebar">
+<!-- ═══ 固定タイトルバー ═══ -->
+<header class="topbar-main">
+  <button class="sb-toggle-btn" onclick="toggleSidebar()" title="メニュー">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <div class="tb-title-main">建築技術課 <span>建築事例DB</span></div>
+</header>
+
+<!-- ═══ サイドバー（オフキャンバス。既定は非表示） ═══ -->
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+<aside class="sidebar" id="sidebarEl">
   <div class="sb-head">
     <div class="sb-org">建築技術課</div>
     <div class="sb-title">建築事例 DB<small>公共施設調査記録</small></div>
@@ -311,10 +331,6 @@ tr:hover td{background:var(--hi)}
     建築物（拡張予定）
   </div>
   <div class="nav-sec">管理</div>
-  <div class="nav-item" onclick="openReg()">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    新規登録
-  </div>
   <div class="nav-item" onclick="openConfig()">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
     Box接続設定
@@ -330,23 +346,6 @@ tr:hover td{background:var(--hi)}
 
 <!-- ═══ MAIN ═══ -->
 <div class="main">
-  <header class="topbar">
-    <div class="tb-title">建築事例</div>
-    <div class="srch">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="searchInput" placeholder="施設名・住所で検索…" oninput="filterCards()">
-    </div>
-    <div class="tw">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      <div class="tgl" onclick="toggleTheme()"><div class="tgl-k"><svg class="ico-sun" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg><svg class="ico-moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></div></div>
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-    </div>
-    <button class="tbtn tbtn-g" onclick="loadData()">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.64"/></svg>
-      更新
-    </button>
-  </header>
-
   <div class="content">
 
     <!-- API未設定バナー（初回のみ表示） -->
@@ -359,9 +358,7 @@ tr:hover td{background:var(--hi)}
       <button class="api-banner-btn" onclick="openConfig()">設定する</button>
     </div>
 
-    <!-- STATS: 案B採用のため撤去。件数は絞り込みチップのバッジに統合 -->
-
-    <!-- CONTROLS -->
+    <!-- CONTROLS 2段目：表示切替＋新規登録 -->
     <div class="ctrl-row-1">
       <div class="vtabs">
         <div class="vtab on" id="tg" onclick="sv('g')">
@@ -373,8 +370,13 @@ tr:hover td{background:var(--hi)}
           リスト
         </div>
       </div>
-      <div class="sec-ct" id="dispCount">— 件</div>
+      <button class="new-reg-btn" onclick="openReg()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        新規登録
+      </button>
     </div>
+
+    <!-- CONTROLS 3段目：絞り込みチップ（左）＋検索・テーマ・更新（右） -->
     <div class="ctrl-row-2">
       <div class="fchips" id="filterChips">
         <div class="fc on" onclick="setFilter(this,'all')">すべて <span class="fc-badge" id="fcAll">—</span></div>
@@ -382,6 +384,22 @@ tr:hover td{background:var(--hi)}
         <div class="fc" onclick="setFilter(this,'oyako')">親子 <span class="fc-badge" id="fcOyako">—</span></div>
         <div class="fc" onclick="setFilter(this,'ostomy')">オストメイト <span class="fc-badge" id="fcOstomy">—</span></div>
         <div class="fc" onclick="setFilter(this,'lgbtq')">LGBTQ <span class="fc-badge" id="fcLgbtq">—</span></div>
+      </div>
+      <div class="ctrl-row-2-right">
+        <div class="sec-ct" id="dispCount">— 件</div>
+        <div class="srch">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchInput" placeholder="施設名・住所で検索…" oninput="filterCards()">
+        </div>
+        <div class="tw">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <div class="tgl" onclick="toggleTheme()"><div class="tgl-k"><svg class="ico-sun" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg><svg class="ico-moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></div></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </div>
+        <button class="tbtn tbtn-g" onclick="loadData()">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.64"/></svg>
+          更新
+        </button>
       </div>
     </div>
 
@@ -1384,6 +1402,11 @@ function sv(v) {
   document.getElementById('vtbl').style.display = v === 't' ? 'block' : 'none';
   document.getElementById('tg').className = 'vtab' + (v === 'g' ? ' on' : '');
   document.getElementById('tt').className = 'vtab' + (v === 't' ? ' on' : '');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebarEl').classList.toggle('open');
+  document.getElementById('sidebarBackdrop').classList.toggle('show');
 }
 
 function toggleTheme() {
