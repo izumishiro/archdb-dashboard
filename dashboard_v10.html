@@ -14,6 +14,7 @@
   --cbf:#E6F1FB; --fbf:#0C447C;
   --cal:#EFEFEB; --fal:#444441;
   --cfm:#FBEAF0; --ffm:#72243E;
+  --cdm:#E6F5EE; --fdm:#0F6E45;
 }
 [data-theme="light"] {
   --bg:#FFFFFF; --s0:#FFFFFF; --s1:#F2F2F7; --s2:#E5E5EA;
@@ -38,6 +39,7 @@
   --primary:#0A84FF; --primary-hi:rgba(10,132,255,.12);
   --cud:#2E2B52; --fud:#AFA9EC; --cbf:#1A2E45; --fbf:#85B7EB;
   --cal:#3E3E3C; --fal:#C8C7C0; --cfm:#3A1828; --ffm:#ED93B1;
+  --cdm:#123829; --fdm:#6FCC9E;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:13px}
@@ -128,6 +130,10 @@ input{font-family:inherit;color:inherit}
 .fc{padding:4px 11px;border-radius:var(--rp);font-size:11px;border:1px solid var(--s2);background:var(--s0);color:var(--t2);cursor:pointer;transition:all var(--ease)}
 .fc:hover{border-color:var(--s3);color:var(--t1)}
 .fc.on{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:500}
+.fc-tdm.on{background:var(--fdm);border-color:var(--fdm)}
+.fc-tfm.on{background:var(--ffm);border-color:var(--ffm)}
+.fc-tbf.on{background:var(--fbf);border-color:var(--fbf)}
+.fc-tud.on{background:var(--fud);border-color:var(--fud)}
 .fc-badge{font-size:9px;opacity:.65;margin-left:2px}
 .fc.on .fc-badge{opacity:.85}
 .sec-ct{font-size:10px;color:var(--t3);margin-left:auto}
@@ -158,6 +164,7 @@ input{font-family:inherit;color:inherit}
 .tbf{background:var(--cbf);color:var(--fbf)}
 .tal{background:var(--cal);color:var(--fal)}
 .tfm{background:var(--cfm);color:var(--ffm)}
+.tdm{background:var(--cdm);color:var(--fdm)}
 .tag-ov{font-size:8.5px;padding:2px 6px;border-radius:var(--rp);font-weight:500;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 
 /* ── TABLE ── */
@@ -169,7 +176,8 @@ tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--hi)}
 .tn{font-weight:500}
 .tsb{font-size:10px;color:var(--t3);margin-top:1px}
-.thm{width:38px;height:28px;background:var(--s1);border-radius:var(--r1);border:1px solid var(--s2);display:flex;align-items:center;justify-content:center}
+.thm{width:38px;height:28px;background:var(--s1);border-radius:var(--r1);border:1px solid var(--s2);display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center}
+.thm.has-img svg{display:none}
 .thm svg{width:13px;height:13px;stroke:currentColor;color:var(--s4)}
 .st{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--t3)}
 .sd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
@@ -222,6 +230,8 @@ tr:hover td{background:var(--hi)}
 .reg-loc-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .reg-loc-head input{flex:1}
 .reg-row{display:flex;gap:6px;margin-bottom:6px}
+.reg-ref-row input:nth-child(1){flex:1}
+.reg-ref-row input:nth-child(2){flex:2}
 .reg-row input:first-child{flex:2}
 .reg-row input:last-child{flex:1}
 .reg-mini-btn{font-size:10.5px;padding:4px 9px;border-radius:5px;background:var(--s2);color:var(--t2);border:none;cursor:pointer}
@@ -259,9 +269,11 @@ tr:hover td{background:var(--hi)}
 .dp-hero-cnt svg{width:9px;height:9px;stroke:currentColor}
 .dp-strip-wrap{padding:10px 20px;border-bottom:1px solid var(--s2)}
 .dp-strip-lbl{font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
-.dp-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
-.dp-strip::-webkit-scrollbar{height:5px}
-.dp-strip::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
+.dp-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:12px;margin-bottom:-4px}
+.dp-strip::-webkit-scrollbar{height:9px}
+.dp-strip::-webkit-scrollbar-track{background:var(--s1);border-radius:5px}
+.dp-strip::-webkit-scrollbar-thumb{background:var(--s3);border-radius:5px;border:2px solid var(--s1)}
+.dp-strip::-webkit-scrollbar-thumb:hover{background:var(--t3)}
 .dp-sthumb{flex:0 0 auto;width:64px;height:64px;border-radius:6px;background:var(--s2);cursor:pointer;background-size:cover;background-position:center;border:2px solid transparent;position:relative;overflow:hidden}
 .dp-sthumb.active{border-color:var(--primary)}
 .dp-sthumb:not(.loaded)::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,var(--s1),var(--s1) 4px,var(--s2) 4px,var(--s2) 8px)}
@@ -272,6 +284,28 @@ tr:hover td{background:var(--hi)}
 .dp-toilet-counts{display:flex;flex-wrap:wrap;gap:6px}
 .dp-toilet-chip{font-size:11px;background:var(--s1);border:1px solid var(--s2);border-radius:6px;padding:4px 9px;color:var(--t1);display:flex;align-items:center;gap:5px}
 .dp-toilet-chip b{color:var(--primary);font-weight:600}
+.dp-toilet-chip.tdm{background:var(--cdm);border-color:var(--cdm);color:var(--fdm)}
+.dp-toilet-chip.tdm b{color:var(--fdm)}
+.dp-toilet-chip.tfm{background:var(--cfm);border-color:var(--cfm);color:var(--ffm)}
+.dp-toilet-chip.tfm b{color:var(--ffm)}
+.dp-toilet-chip.tbf{background:var(--cbf);border-color:var(--cbf);color:var(--fbf)}
+.dp-toilet-chip.tbf b{color:var(--fbf)}
+.dp-ref-item{padding:8px 0;border-bottom:1px solid var(--s2);font-size:12px}
+.dp-ref-item:last-child{border-bottom:none}
+.dp-ref-name{font-weight:500;color:var(--t1);margin-bottom:2px}
+.dp-ref-url{color:var(--primary);word-break:break-all;font-size:11px}
+.dp-ref-date{color:var(--t3);font-size:10.5px;margin-top:2px}
+.dp-drawing{width:100%;aspect-ratio:1.4/1;border-radius:var(--r2);background:var(--s1);border:1px solid var(--s2);background-size:contain;background-repeat:no-repeat;background-position:center;cursor:zoom-in}
+
+/* ── ライトボックス ── */
+.lightbox{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s;overflow:hidden;touch-action:none}
+.lightbox.open{opacity:1;pointer-events:auto}
+.lightbox img{max-width:92vw;max-height:92vh;user-select:none;cursor:grab;transform-origin:center center;will-change:transform}
+.lightbox img:active{cursor:grabbing}
+.lb-close{position:absolute;top:18px;right:20px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.12);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.lb-close:hover{background:rgba(255,255,255,.22)}
+.lb-close svg{width:16px;height:16px;stroke:currentColor}
+.lb-hint{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);font-size:11px;color:rgba(255,255,255,.55);pointer-events:none}
 .dp-sec{padding:14px 16px;border-bottom:1px solid var(--s2)}
 .dp-sec:last-child{border-bottom:none;padding-bottom:20px}
 .dp-sec-ttl{font-size:9.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
@@ -389,10 +423,10 @@ tr:hover td{background:var(--hi)}
     <div class="ctrl-row-2">
       <div class="fchips" id="filterChips">
         <div class="fc on" onclick="setFilter(this,'all')">すべて <span class="fc-badge" id="fcAll">—</span></div>
-        <div class="fc" onclick="setFilter(this,'daremo')">だれでも <span class="fc-badge" id="fcDaremo">—</span></div>
-        <div class="fc" onclick="setFilter(this,'oyako')">親子 <span class="fc-badge" id="fcOyako">—</span></div>
-        <div class="fc" onclick="setFilter(this,'ostomy')">オストメイト <span class="fc-badge" id="fcOstomy">—</span></div>
-        <div class="fc" onclick="setFilter(this,'lgbtq')">LGBTQ <span class="fc-badge" id="fcLgbtq">—</span></div>
+        <div class="fc fc-tdm" onclick="setFilter(this,'daremo')">だれでも <span class="fc-badge" id="fcDaremo">—</span></div>
+        <div class="fc fc-tfm" onclick="setFilter(this,'oyako')">親子 <span class="fc-badge" id="fcOyako">—</span></div>
+        <div class="fc fc-tbf" onclick="setFilter(this,'ostomy')">オストメイト <span class="fc-badge" id="fcOstomy">—</span></div>
+        <div class="fc fc-tud" onclick="setFilter(this,'lgbtq')">LGBTQ <span class="fc-badge" id="fcLgbtq">—</span></div>
       </div>
       <button class="new-reg-btn" onclick="openReg()">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -469,7 +503,7 @@ tr:hover td{background:var(--hi)}
 </div>
 
 <!-- 新規登録モーダル -->
-<div class="cfg-modal" id="regModal" onclick="if(event.target===this)closeReg()">
+<div class="cfg-modal" id="regModal">
   <div class="cfg-box reg-box">
     <div class="cfg-head">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:15px;height:15px;flex-shrink:0"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -493,9 +527,20 @@ tr:hover td{background:var(--hi)}
       </div>
 
       <div class="cfg-field">
-        <div class="cfg-lbl">トイレ設備（拠点ごとに区分と数量を入力。不明な区分は空欄でOK）</div>
+        <div class="cfg-lbl">トイレ設備（拠点ごとに区分と数量を入力。不明な区分は空欄でOK。数量不明でも区分名だけ入れれば「あり」として記録されます）</div>
         <div id="regLocs"></div>
         <button class="reg-mini-btn" style="align-self:flex-start" onclick="regAddLocation()">＋ 拠点を追加（メイン以外にトイレがある場合）</button>
+      </div>
+
+      <div class="cfg-field">
+        <div class="cfg-lbl">参考資料（引用元URL・資料名・取得（確認）日）</div>
+        <div id="regRefs"></div>
+        <button class="reg-mini-btn" style="align-self:flex-start" onclick="regAddRef()">＋ 資料を追加</button>
+      </div>
+
+      <div class="cfg-field">
+        <div class="cfg-lbl">平面図（Box上の画像ファイルURL。取得できない場合は空欄でOK）</div>
+        <input class="cfg-input" id="regDrawingUrl" placeholder="https://xxx.app.box.com/file/123456789">
       </div>
     </div>
     <div class="cfg-foot">
@@ -503,6 +548,15 @@ tr:hover td{background:var(--hi)}
       <button class="cfg-btn cfg-btn-save" id="regSaveBtn" onclick="submitNewFacility()">登録してBoxに保存</button>
     </div>
   </div>
+</div>
+
+<!-- ═══ ライトボックス（拡大表示・ホイールでズーム・ドラッグでパン） ═══ -->
+<div class="lightbox" id="lightbox" onclick="if(event.target===this)closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <div class="lb-hint">ホイールで拡大縮小 ／ ドラッグで移動</div>
+  <img id="lbImg" src="" draggable="false">
 </div>
 
 <!-- ═══ DETAIL PANEL ═══ -->
@@ -553,6 +607,14 @@ tr:hover td{background:var(--hi)}
       <div class="dp-sec-ttl">トイレ設備</div>
       <div id="dp-toilet"></div>
     </div>
+    <div class="dp-sec" id="dp-drawing-sec" style="display:none">
+      <div class="dp-sec-ttl">平面図</div>
+      <div class="dp-drawing" id="dp-drawing"></div>
+    </div>
+    <div class="dp-sec" id="dp-refs-sec" style="display:none">
+      <div class="dp-sec-ttl">参考資料</div>
+      <div id="dp-refs"></div>
+    </div>
     <div class="dp-sec">
       <div class="dp-sec-ttl">調査情報</div>
       <div class="dp-grid">
@@ -570,6 +632,10 @@ tr:hover td{background:var(--hi)}
     <button class="dp-btn dp-btn-sec" onclick="openReg(currentDetailCode)">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg>
       編集
+    </button>
+    <button class="dp-btn dp-btn-sec" id="dp-preview-btn" onclick="generateAndSavePreview()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      プレビュー保存
     </button>
     <button class="dp-btn dp-btn-sec" id="dp-sp-link">
       <svg viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -641,7 +707,7 @@ function closeConfig() {
 /* ══════════════════════════════════════════
    新規登録モーダル
 ══════════════════════════════════════════ */
-const COMMON_TOILET_CATS = ['男子大便器', '男子小便器', '男子洗面', '女子', '女子洗面', '多機能', 'ファミリー', '男女共用', 'ベビーコーナー', '小児用'];
+const COMMON_TOILET_CATS = ['男子大便器', '男子小便器', '男子洗面', '女子', '女子洗面', '多機能', 'ファミリー', '男女共用', '男子オストメイト', '女子オストメイト', '共用オストメイト', '授乳室・おむつ交換', '小児用'];
 
 function nextFacilityCode() {
   const nums = DB.facilities
@@ -678,6 +744,18 @@ function regAddLocation() {
   document.getElementById('regLocs').insertAdjacentHTML('beforeend', regLocationHtml(''));
 }
 
+function regRefRowHtml(name, url, date) {
+  return `<div class="reg-row reg-ref-row">
+    <input class="cfg-input" placeholder="資料名（例：LIXIL カタログ）" value="${escHtml(name || '')}">
+    <input class="cfg-input" placeholder="https://…（引用元URL）" value="${escHtml(url || '')}">
+    <input class="cfg-input" type="date" value="${escHtml(date || '')}" style="flex:0 0 132px">
+    <button class="reg-del" onclick="this.parentElement.remove()" title="この行を削除">×</button>
+  </div>`;
+}
+function regAddRef() {
+  document.getElementById('regRefs').insertAdjacentHTML('beforeend', regRefRowHtml('', '', ''));
+}
+
 let regEditCode = null; // null=新規登録、値あり=編集対象の施設コード
 
 function openReg(code) {
@@ -707,14 +785,20 @@ function openReg(code) {
     document.getElementById('regSurveyors').value = sv.Surveyors || '';
     const locs = (f.toilets && f.toilets.length) ? f.toilets : [{ location: 'メイントイレ', counts: {} }];
     document.getElementById('regLocs').innerHTML = locs.map(l => regLocationHtml(l.location, l.counts)).join('');
+    document.getElementById('regDrawingUrl').value = f.drawingFileId ? `https://app.box.com/file/${f.drawingFileId}` : '';
+    const refs = f.references || [];
+    document.getElementById('regRefs').innerHTML = refs.length
+      ? refs.map(r => regRefRowHtml(r.name, r.url, r.acquiredDate)).join('')
+      : '';
   } else {
     titleEl.textContent = '施設 新規登録';
     saveBtn.textContent = '登録してBoxに保存';
     codeInput.disabled = false;
     codeInput.value = nextFacilityCode();
-    ['regName','regAddr','regUse','regYear','regArch','regCont','regBoxUrl','regDate','regSurveyors']
+    ['regName','regAddr','regUse','regYear','regArch','regCont','regBoxUrl','regDate','regSurveyors','regDrawingUrl']
       .forEach(id => document.getElementById(id).value = '');
     document.getElementById('regLocs').innerHTML = regLocationHtml('メイントイレ');
+    document.getElementById('regRefs').innerHTML = '';
   }
   document.getElementById('regModal').classList.add('open');
 }
@@ -734,6 +818,10 @@ function extractBoxFolderId(url) {
   const m = (url || '').match(/folder\/(\d+)/);
   return m ? m[1] : '';
 }
+function extractBoxFileId(url) {
+  const m = (url || '').match(/file\/(\d+)/);
+  return m ? m[1] : '';
+}
 
 async function submitNewFacility() {
   const code = document.getElementById('regCode').value.trim();
@@ -751,10 +839,27 @@ async function submitNewFacility() {
       const inputs = row.querySelectorAll('input');
       const k = inputs[0].value.trim();
       const v = inputs[1].value.trim();
-      if (k && v !== '') counts[k] = Number(v);
+      if (k) counts[k] = v !== '' ? Number(v) : 1; // 数量未入力＝「あり」として1を記録
     });
     return { location: locName || '未設定', counts };
   }).filter(t => Object.keys(t.counts).length > 0 || t.location !== '未設定');
+
+  // 参考資料の組み立て（URLはhttps://必須。空行は除外）
+  const references = [];
+  for (const row of document.querySelectorAll('#regRefs .reg-ref-row')) {
+    const inputs = row.querySelectorAll('input');
+    const refName = inputs[0].value.trim();
+    const refUrl = inputs[1].value.trim();
+    const refDate = inputs[2].value.trim();
+    if (!refName && !refUrl && !refDate) continue;
+    if (refUrl && !/^https:\/\//.test(refUrl)) {
+      regShowMsg(`参考資料のURLは https:// から始めてください（${refName || refUrl}）`, false);
+      return;
+    }
+    references.push({ name: refName, url: refUrl, acquiredDate: refDate });
+  }
+
+  const drawingFileId = extractBoxFileId(document.getElementById('regDrawingUrl').value.trim());
 
   const existing = isEdit ? DB.facilities.find(f => f.Title === regEditCode) : null;
 
@@ -767,6 +872,8 @@ async function submitNewFacility() {
     Architect: document.getElementById('regArch').value.trim(),
     Contractor: document.getElementById('regCont').value.trim(),
     boxFolderId: extractBoxFolderId(document.getElementById('regBoxUrl').value.trim()),
+    drawingFileId,
+    references,
     bfud: (existing && existing.bfud) || { TagCustom: '' },
     survey: {
       SurveyDate: document.getElementById('regDate').value.trim(),
@@ -817,6 +924,110 @@ async function boxUploadJson(fileId, jsonObj) {
     throw new Error(`Box保存失敗 HTTP ${res.status} ${t.slice(0, 200)}`);
   }
   return res.json();
+}
+
+// 既存ファイルへバイナリの新バージョンをアップロード（画像等の汎用版）
+async function boxUploadFileVersion(fileId, filename, blob) {
+  const token = await getAccessToken();
+  if (!token) throw new Error('NOT_AUTHED');
+  const form = new FormData();
+  form.append('attributes', JSON.stringify({ name: filename }));
+  form.append('file', blob, filename);
+  const res = await fetch(`https://upload.box.com/api/2.0/files/${fileId}/content`, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token },
+    body: form
+  });
+  if (!res.ok) {
+    const t = await res.text().catch(() => '');
+    throw new Error(`Box保存失敗 HTTP ${res.status} ${t.slice(0, 200)}`);
+  }
+  const j = await res.json();
+  return j.entries[0].id;
+}
+
+// _マスタフォルダに新規ファイルを作成（同名ファイルがあれば新バージョンとして上書き）
+async function boxUploadNewFile(folderId, filename, blob) {
+  const token = await getAccessToken();
+  if (!token) throw new Error('NOT_AUTHED');
+  const form = new FormData();
+  form.append('attributes', JSON.stringify({ name: filename, parent: { id: folderId } }));
+  form.append('file', blob, filename);
+  const res = await fetch('https://upload.box.com/api/2.0/files/content', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token },
+    body: form
+  });
+  if (res.status === 409) {
+    // 同名ファイルが既存 → そのファイルIDへ新バージョンとしてアップロードし直す
+    const conflict = await res.json().catch(() => null);
+    const existingId = conflict?.context_info?.conflicts?.id;
+    if (existingId) return boxUploadFileVersion(existingId, filename, blob);
+    throw new Error('同名ファイルが既存ですが、IDを取得できませんでした');
+  }
+  if (!res.ok) {
+    const t = await res.text().catch(() => '');
+    throw new Error(`Box保存失敗 HTTP ${res.status} ${t.slice(0, 200)}`);
+  }
+  const j = await res.json();
+  return j.entries[0].id;
+}
+
+/* ══════════════════════════════════════════
+   プレビュー画像をDBに永続保管（画面表示・報告書添付に耐える解像度に縮小してBoxへ保存）
+══════════════════════════════════════════ */
+const PREVIEW_MAX_DIM = 1600; // 長辺の上限px（画面表示・報告書添付用途で十分な解像度）
+const PREVIEW_QUALITY = 0.85;
+
+async function generateAndSavePreview() {
+  const code = currentDetailCode;
+  if (!code) return;
+  const btn = document.getElementById('dp-preview-btn');
+  const heroEl = document.querySelector('.dp-hero');
+  const bg = heroEl.style.backgroundImage;
+  const m = bg.match(/url\("(.+)"\)/);
+  if (!m) { alert('表示中の写真がありません。先に写真一覧から1枚選択してください。'); return; }
+  const blobUrl = m[1];
+
+  const origLabel = btn.innerHTML;
+  btn.innerHTML = '保存中…';
+  btn.disabled = true;
+  try {
+    const img = new Image();
+    img.src = blobUrl;
+    await img.decode();
+    let { naturalWidth: w, naturalHeight: h } = img;
+    if (w > h && w > PREVIEW_MAX_DIM) { h = Math.round(h * PREVIEW_MAX_DIM / w); w = PREVIEW_MAX_DIM; }
+    else if (h > PREVIEW_MAX_DIM) { w = Math.round(w * PREVIEW_MAX_DIM / h); h = PREVIEW_MAX_DIM; }
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', PREVIEW_QUALITY));
+    if (!blob) throw new Error('画像の圧縮に失敗しました');
+
+    const folderId = await getMasterFolderId();
+    const filename = `preview_${code}.jpg`;
+    const previewFileId = await boxUploadNewFile(folderId, filename, blob);
+
+    const dbFileId = await findDbFileId();
+    const json = await fetchDbJson();
+    const idx = (json.facilities || []).findIndex(f => f.Title === code);
+    if (idx === -1) throw new Error('db.json内に対象施設が見つかりません');
+    json.facilities[idx].previewImageId = previewFileId;
+    json.updatedAt = new Date().toISOString().slice(0, 10);
+    await boxUploadJson(dbFileId, json);
+
+    imgBlobCache.delete(previewFileId); // 念のため古いキャッシュを除去
+    thumbCache.delete(code); // サムネキャッシュを更新対象にする
+    btn.innerHTML = '保存しました ✓';
+    await loadData();
+    setTimeout(() => { btn.innerHTML = origLabel; btn.disabled = false; }, 1800);
+  } catch (e) {
+    console.error(e);
+    alert('プレビュー画像の保存に失敗しました：' + e.message);
+    btn.innerHTML = origLabel;
+    btn.disabled = false;
+  }
 }
 
 /* ══════════════════════════════════════════
@@ -891,6 +1102,8 @@ async function boxFetch(url, opts = {}) {
   return res;
 }
 
+const MASTER_FOLDER_CACHE_KEY = 'archdb_box_masterfolder';
+
 async function findDbFileId() {
   const cached = localStorage.getItem(CACHE_KEY);
   if (cached) return cached;
@@ -898,12 +1111,23 @@ async function findDbFileId() {
   const root = await (await boxFetch(`https://api.box.com/2.0/folders/${BOX_ROOT_FOLDER}/items?fields=id,name,type&limit=1000`)).json();
   const master = (root.entries || []).find(e => e.type === 'folder' && e.name === '_マスタ');
   if (!master) throw new Error('Box内に「_マスタ」フォルダが見つかりません');
+  localStorage.setItem(MASTER_FOLDER_CACHE_KEY, master.id);
   // _マスタ内から db.json を探す
   const items = await (await boxFetch(`https://api.box.com/2.0/folders/${master.id}/items?fields=id,name,type&limit=1000`)).json();
   const dbf = (items.entries || []).find(e => e.type === 'file' && e.name === 'db.json');
   if (!dbf) throw new Error('「_マスタ」フォルダ内に db.json が見つかりません');
   localStorage.setItem(CACHE_KEY, dbf.id);
   return dbf.id;
+}
+
+async function getMasterFolderId() {
+  const cached = localStorage.getItem(MASTER_FOLDER_CACHE_KEY);
+  if (cached) return cached;
+  const root = await (await boxFetch(`https://api.box.com/2.0/folders/${BOX_ROOT_FOLDER}/items?fields=id,name,type&limit=1000`)).json();
+  const master = (root.entries || []).find(e => e.type === 'folder' && e.name === '_マスタ');
+  if (!master) throw new Error('Box内に「_マスタ」フォルダが見つかりません');
+  localStorage.setItem(MASTER_FOLDER_CACHE_KEY, master.id);
+  return master.id;
 }
 
 async function fetchDbJson() {
@@ -954,6 +1178,16 @@ const IMG_EXT = /\.(jpe?g|png|heic|heif|webp)$/i;
 
 async function getThumbUrl(f) {
   if (thumbCache.has(f.Title)) return thumbCache.get(f.Title);
+  // DB保管済みのプレビュー画像があれば最優先（元写真が削除されても表示できる）
+  if (f.previewImageId) {
+    try {
+      const url = await getImageBlobUrl(f.previewImageId);
+      thumbCache.set(f.Title, url);
+      return url;
+    } catch(e) {
+      console.warn('プレビュー画像取得失敗。元フォルダから再取得します', f.Title, e.message);
+    }
+  }
   if (!f.boxFolderId) { thumbCache.set(f.Title, null); return null; }
   try {
     const files = await listImageFiles(f.boxFolderId);
@@ -1035,6 +1269,8 @@ function setHeroImage(url) {
   heroEl.style.backgroundSize = 'cover';
   heroEl.style.backgroundPosition = 'center';
   heroEl.classList.add('has-img');
+  heroEl.style.cursor = 'zoom-in';
+  heroEl.onclick = () => openLightbox(url);
 }
 
 async function loadStripThumb(el, fileId) {
@@ -1101,11 +1337,27 @@ async function loadPhotoStripForFacility(f) {
    データ整形・描画
 ══════════════════════════════════════════ */
 const TAG_MAP = {
-  TagDaremo: {label:'だれでもトイレ', cls:'tal'},
+  TagDaremo: {label:'だれでもトイレ', cls:'tdm'},
   TagOyako: {label:'親子トイレ', cls:'tfm'},
-  TagOstomy: {label:'オストメイト', cls:'tal'},
+  TagOstomy: {label:'オストメイト', cls:'tbf'},
   TagLGBTQ: {label:'LGBTQ配慮', cls:'tud'},
 };
+
+// トイレ設備の区分名 → BF・UDタグ判定キーワード（一般トイレ項目は判定対象外）
+const TAG_KEYWORDS = {
+  TagDaremo: ['多機能', 'ファミリー', '男女共用', 'LGBTQ'],
+  TagOyako:  ['ファミリー', '小児用', '子供用'],
+  TagOstomy: ['オストメイト'],
+  TagLGBTQ:  ['男女共用']
+};
+
+// トイレ設備チップの区分名から、対応する絞り込みチップと同じ色クラスを判定
+function toiletChipColorClass(key) {
+  if (TAG_KEYWORDS.TagOstomy.some(kw => key.includes(kw))) return 'tbf';
+  if (TAG_KEYWORDS.TagOyako.some(kw => key.includes(kw))) return 'tfm';
+  if (TAG_KEYWORDS.TagDaremo.some(kw => key.includes(kw))) return 'tdm';
+  return '';
+}
 
 // グローバルデータストア
 let DB = { facilities: [], bfud: {}, survey: {} };
@@ -1137,13 +1389,6 @@ async function loadData() {
     const json = await fetchDbJson();
     const list = json.facilities || [];
 
-    // トイレ設備データから BF・UD タグを自動推定（一般トイレ項目は判定対象外）
-    const TAG_KEYWORDS = {
-      TagDaremo: ['多機能', 'ファミリー', '男女共用', 'LGBTQ'],
-      TagOyako:  ['ファミリー', '小児用', '子供用', 'ベビーコーナー'],
-      TagOstomy: ['オストメイト'],
-      TagLGBTQ:  ['男女共用']
-    };
     function deriveTagsFromToilets(toilets) {
       const keys = (toilets || []).flatMap(t => Object.keys(t.counts || {}));
       const has = kwList => keys.some(k => kwList.some(kw => k.includes(kw)));
@@ -1331,7 +1576,7 @@ function renderTable() {
     const tags = buildTags(f.Title);
     return `
     <tr onclick="openDetail('${escHtml(f.Title)}')">
-      <td><div class="thm"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div></td>
+      <td><div class="thm" data-thumb-for="${escHtml(f.Title)}"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div></td>
       <td><div class="tn">${escHtml(f.FacilityName || f.Title)}</div><div class="tsb">${escHtml(f.Title)}</div></td>
       <td style="color:var(--t3);font-size:11px">${escHtml(f.Address || '')}</td>
       <td>${tags || '—'}</td>
@@ -1340,11 +1585,9 @@ function renderTable() {
       <td><div class="st"><span class="sd ${statusOk ? 'sd-ok' : 'sd-ng'}"></span>${escHtml(sv.Status || '未設定')}</div></td>
     </tr>`;
   }).join('');
+  hydrateThumbs(filteredData);
 }
 
-/* ══════════════════════════════════════════
-   詳細パネル
-══════════════════════════════════════════ */
 function openDetail(code) {
   const f = DB.facilities.find(x => x.Title === code);
   if (!f) return;
@@ -1378,19 +1621,14 @@ function openDetail(code) {
   const heroEl = document.querySelector('.dp-hero');
   heroEl.style.backgroundImage = '';
   heroEl.classList.remove('has-img');
+  heroEl.onclick = null;
   const cached = thumbCache.get(f.Title);
   if (cached) {
-    heroEl.style.backgroundImage = `url("${cached}")`;
-    heroEl.style.backgroundSize = 'cover';
-    heroEl.style.backgroundPosition = 'center';
-    heroEl.classList.add('has-img');
+    setHeroImage(cached);
   } else if (f.boxFolderId) {
     getThumbUrl(f).then(url => {
       if (url && document.getElementById('detailPanel').classList.contains('open') && document.getElementById('dp-code').textContent.includes(f.Title)) {
-        heroEl.style.backgroundImage = `url("${url}")`;
-        heroEl.style.backgroundSize = 'cover';
-        heroEl.style.backgroundPosition = 'center';
-        heroEl.classList.add('has-img');
+        setHeroImage(url);
       }
     });
   }
@@ -1412,12 +1650,43 @@ function openDetail(code) {
       <div class="dp-toilet-loc">
         <div class="dp-toilet-loc-name">${escHtml(t.location || '')}</div>
         <div class="dp-toilet-counts">${
-          Object.entries(t.counts || {}).map(([k, v]) => `<span class="dp-toilet-chip">${escHtml(k)}<b>${v}</b></span>`).join('')
+          Object.entries(t.counts || {}).map(([k, v]) => `<span class="dp-toilet-chip ${toiletChipColorClass(k)}">${escHtml(k)}<b>${v}</b></span>`).join('')
           || '<span class="unknown">数量未登録</span>'
         }</div>
       </div>`).join('');
   } else {
     toiletSec.style.display = 'none';
+  }
+
+  // 参考資料
+  const refsSec = document.getElementById('dp-refs-sec');
+  const refs = f.references || [];
+  if (refs.length) {
+    refsSec.style.display = 'block';
+    document.getElementById('dp-refs').innerHTML = refs.map(r => `
+      <div class="dp-ref-item">
+        <div class="dp-ref-name">${escHtml(r.name || '（資料名未登録）')}</div>
+        ${r.url ? `<a class="dp-ref-url" href="${escHtml(r.url)}" target="_blank" rel="noopener">${escHtml(r.url)}</a>` : ''}
+        ${r.acquiredDate ? `<div class="dp-ref-date">取得（確認）日：${escHtml(r.acquiredDate)}</div>` : ''}
+      </div>`).join('');
+  } else {
+    refsSec.style.display = 'none';
+  }
+
+  // 平面図（写真とは別枠。取得できている場合のみ表示）
+  const drawingSec = document.getElementById('dp-drawing-sec');
+  const drawingEl = document.getElementById('dp-drawing');
+  if (f.drawingFileId) {
+    drawingSec.style.display = 'block';
+    drawingEl.style.backgroundImage = '';
+    drawingEl.onclick = null;
+    getImageBlobUrl(f.drawingFileId).then(url => {
+      if (currentDetailCode !== f.Title) return;
+      drawingEl.style.backgroundImage = `url("${url}")`;
+      drawingEl.onclick = () => openLightbox(url);
+    }).catch(e => console.warn('平面図取得失敗', e.message));
+  } else {
+    drawingSec.style.display = 'none';
   }
 
   // Box リンク（施設フォルダIDがdb.jsonにあれば直接、なければDBルート）
@@ -1453,6 +1722,61 @@ function sv(v) {
   document.getElementById('tg').className = 'vtab' + (v === 'g' ? ' on' : '');
   document.getElementById('tt').className = 'vtab' + (v === 't' ? ' on' : '');
 }
+
+/* ══════════════════════════════════════════
+   ライトボックス（拡大表示・ホイールズーム・ドラッグパン）
+══════════════════════════════════════════ */
+let lbScale = 1, lbX = 0, lbY = 0, lbDragging = false, lbStartX = 0, lbStartY = 0;
+
+function lbApplyTransform() {
+  document.getElementById('lbImg').style.transform = `translate(${lbX}px, ${lbY}px) scale(${lbScale})`;
+}
+
+function openLightbox(url) {
+  lbScale = 1; lbX = 0; lbY = 0;
+  const img = document.getElementById('lbImg');
+  img.src = url;
+  lbApplyTransform();
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+(function initLightboxInteraction() {
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lbImg');
+  if (!lb || !img) return;
+
+  lb.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const delta = -e.deltaY * 0.0015;
+    lbScale = Math.min(6, Math.max(1, lbScale + delta * lbScale * 3));
+    if (lbScale <= 1) { lbScale = 1; lbX = 0; lbY = 0; }
+    lbApplyTransform();
+  }, { passive: false });
+
+  img.addEventListener('mousedown', (e) => {
+    if (lbScale <= 1) return;
+    lbDragging = true;
+    lbStartX = e.clientX - lbX;
+    lbStartY = e.clientY - lbY;
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!lbDragging) return;
+    lbX = e.clientX - lbStartX;
+    lbY = e.clientY - lbStartY;
+    lbApplyTransform();
+  });
+  window.addEventListener('mouseup', () => { lbDragging = false; });
+
+  img.addEventListener('dblclick', () => {
+    if (lbScale > 1) { lbScale = 1; lbX = 0; lbY = 0; } else { lbScale = 2.5; }
+    lbApplyTransform();
+  });
+})();
 
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebarEl');
@@ -1514,6 +1838,17 @@ document.addEventListener('keydown', e => {
 
   // データ自動読込
   loadData();
+
+  // 写真ストリップ：マウスホイール(上下)を横スクロールに変換
+  const stripEl = document.getElementById('dpStrip');
+  if (stripEl) {
+    stripEl.addEventListener('wheel', (e) => {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        stripEl.scrollLeft += e.deltaY;
+      }
+    }, { passive: false });
+  }
 })();
 </script>
 </body>
