@@ -156,6 +156,9 @@ input{font-family:inherit;color:inherit}
 .gmeta svg{width:10px;height:10px;stroke:currentColor;flex-shrink:0}
 .gtl{font-size:11px;color:var(--t3);display:flex;flex-wrap:wrap;gap:0}
 .gtl-item{white-space:nowrap}
+.gtl-major{font-weight:600;color:var(--t2);white-space:nowrap;margin-right:1px}
+.gtl-major:not(:first-child){margin-left:6px}
+.gtl-major::after{content:'：'}
 .gtl-item:not(:last-child)::after{content:'・';color:var(--t3)}
 
 /* ── TAGS ── */
@@ -1596,10 +1599,32 @@ function flattenToiletTotals(toilets) {
 function buildToiletSummary(f) {
   const toilets = f.toilets || [];
   if (!toilets.length) return '';
-  const totals = flattenToiletTotals(toilets);
-  return Object.entries(totals).map(([label, o]) => {
-    const txt = o.hasWashiki ? `${label}${o.value}(内和式${o.washiki})` : `${label}${o.value}`;
-    return `<span class="gtl-item">${escHtml(txt)}</span>`;
+  // 大分類ごとに集計（男子・女子・共用の順でグループ表示）
+  const majorTotals = {};
+  toilets.forEach(t => {
+    const cats = t.categories || {};
+    TOILET_MAJOR_CATS.forEach(major => {
+      const catObj = cats[major];
+      if (!catObj) return;
+      if (!majorTotals[major]) majorTotals[major] = {};
+      Object.entries(catObj).forEach(([minor, v]) => {
+        if (minor === TOILET_WASHIKI_KEY) return;
+        if (!majorTotals[major][minor]) majorTotals[major][minor] = { value: 0, washiki: 0, hasWashiki: false };
+        majorTotals[major][minor].value += v;
+      });
+      if (catObj[TOILET_WASHIKI_KEY] != null) {
+        if (!majorTotals[major]['大便器']) majorTotals[major]['大便器'] = { value: 0, washiki: 0, hasWashiki: false };
+        majorTotals[major]['大便器'].washiki += catObj[TOILET_WASHIKI_KEY];
+        majorTotals[major]['大便器'].hasWashiki = true;
+      }
+    });
+  });
+  return TOILET_MAJOR_CATS.filter(m => majorTotals[m] && Object.keys(majorTotals[m]).length).map(major => {
+    const items = Object.entries(majorTotals[major]).map(([minor, o]) => {
+      const txt = o.hasWashiki ? `${minor}${o.value}(内和式${o.washiki})` : `${minor}${o.value}`;
+      return `<span class="gtl-item">${escHtml(txt)}</span>`;
+    }).join('');
+    return `<span class="gtl-major">${escHtml(major)}</span>${items}`;
   }).join('');
 }
 
