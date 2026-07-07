@@ -838,11 +838,41 @@ async function loadData() {
     const json = await fetchDbJson();
     const list = json.facilities || [];
 
+    // トイレ設備データから BF・UD タグを自動推定（一般トイレ項目は判定対象外）
+    const TAG_KEYWORDS = {
+      TagDaremo: ['多機能', 'ファミリー', '男女共用', 'LGBTQ'],
+      TagOyako:  ['ファミリー', '小児用', '子供用', 'ベビーコーナー'],
+      TagOstomy: ['オストメイト'],
+      TagLGBTQ:  ['男女共用']
+    };
+    function deriveTagsFromToilets(toilets) {
+      const keys = (toilets || []).flatMap(t => Object.keys(t.counts || {}));
+      const has = kwList => keys.some(k => kwList.some(kw => k.includes(kw)));
+      return {
+        TagUD: toilets && toilets.length > 0,
+        TagBF: toilets && toilets.length > 0,
+        TagDaremo: has(TAG_KEYWORDS.TagDaremo),
+        TagOyako:  has(TAG_KEYWORDS.TagOyako),
+        TagOstomy: has(TAG_KEYWORDS.TagOstomy),
+        TagLGBTQ:  has(TAG_KEYWORDS.TagLGBTQ)
+      };
+    }
+
     // v9互換のデータ構造に変換（描画系は変更なしで動作）
     DB.bfud = {};
     DB.survey = {};
     list.forEach(f => {
-      if (f.bfud)   DB.bfud[f.Title]   = f.bfud;
+      const manual = f.bfud || {};
+      const auto = deriveTagsFromToilets(f.toilets);
+      DB.bfud[f.Title] = {
+        TagUD:      !!manual.TagUD      || auto.TagUD,
+        TagBF:      !!manual.TagBF      || auto.TagBF,
+        TagDaremo:  !!manual.TagDaremo  || auto.TagDaremo,
+        TagOyako:   !!manual.TagOyako   || auto.TagOyako,
+        TagOstomy:  !!manual.TagOstomy  || auto.TagOstomy,
+        TagLGBTQ:   !!manual.TagLGBTQ   || auto.TagLGBTQ,
+        TagCustom:  manual.TagCustom || ''
+      };
       if (f.survey) DB.survey[f.Title] = f.survey;
     });
     DB.facilities = list;
