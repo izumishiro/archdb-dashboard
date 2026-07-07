@@ -108,6 +108,12 @@ input{font-family:inherit;color:inherit}
 .content{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
 .content::-webkit-scrollbar{width:4px}
 .content::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px}
+.compare-bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;background:var(--t1);color:var(--bg);border-radius:var(--r3);padding:9px 16px;font-size:12px;box-shadow:var(--sh2)}
+.compare-bar-sep{width:1px;height:16px;background:rgba(255,255,255,.25)}
+.compare-bar-clear{background:none;border:1px solid rgba(255,255,255,.3);color:var(--bg);border-radius:var(--r2);height:28px;padding:0 12px;font-size:11.5px;cursor:pointer}
+.compare-bar-clear:hover{background:rgba(255,255,255,.1)}
+.compare-bar-go{margin-left:auto;background:var(--primary);color:#fff;border:none;border-radius:var(--r2);height:28px;padding:0 16px;font-size:11.5px;font-weight:500;cursor:pointer}
+.compare-bar-go:hover{opacity:.88}
 
 /* ── STATS ── */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
@@ -150,6 +156,11 @@ input{font-family:inherit;color:inherit}
 .gcnt{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.35);backdrop-filter:blur(6px);color:rgba(255,255,255,.85);font-size:9px;padding:2px 7px;border-radius:var(--rp);display:flex;align-items:center;gap:3px}
 .gcnt svg{width:9px;height:9px;stroke:currentColor}
 .gtags-ov{position:absolute;bottom:8px;left:8px;display:flex;gap:3px}
+.gcmp{position:absolute;top:8px;left:8px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.88);border:1.5px solid rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background var(--ease),border-color var(--ease)}
+.gcmp svg{width:12px;height:12px;stroke:#fff;opacity:0;transition:opacity var(--ease)}
+.gcmp:hover{border-color:var(--primary)}
+.gcmp.on{background:var(--primary);border-color:var(--primary)}
+.gcmp.on svg{opacity:1}
 .gbody{padding:11px 13px}
 .gname{font-size:12.5px;font-weight:500;color:var(--t1);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gmeta{font-size:10.5px;color:var(--t3);display:flex;align-items:center;gap:5px;margin-bottom:8px}
@@ -182,6 +193,7 @@ tr:hover td{background:var(--hi)}
 .tsb{font-size:10px;color:var(--t3);margin-top:1px}
 .thm{width:38px;height:28px;background:var(--s1);border-radius:var(--r1);border:1px solid var(--s2);display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center}
 .thm.has-img svg{display:none}
+.tcmp{width:15px;height:15px;cursor:pointer;accent-color:var(--primary)}
 .thm svg{width:13px;height:13px;stroke:currentColor;color:var(--s4)}
 .st{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--t3)}
 .sd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
@@ -318,7 +330,31 @@ tr:hover td{background:var(--hi)}
 .dp-ref-date{color:var(--t3);font-size:10.5px;margin-top:2px}
 .dp-drawing{width:100%;aspect-ratio:1.4/1;border-radius:var(--r2);background:var(--s1);border:1px solid var(--s2);background-size:contain;background-repeat:no-repeat;background-position:center;cursor:zoom-in}
 
-/* ── ライトボックス ── */
+/* ── 比較表 ── */
+.compare-view{position:fixed;inset:0;z-index:450;background:var(--bg);display:none;flex-direction:column}
+.compare-view.open{display:flex}
+.cmp-head{flex-shrink:0;height:56px;background:var(--acc);border-bottom:1px solid var(--acc-deep);display:flex;align-items:center;gap:10px;padding:0 20px}
+.cmp-head-ttl{font-size:14px;font-weight:500;color:var(--acc-t)}
+.cmp-head-sub{font-size:11px;color:var(--acc-sub)}
+.cmp-body{flex:1;overflow:auto;padding:20px}
+.cmp-table{border-collapse:separate;border-spacing:0;font-size:12px;background:var(--s0)}
+.cmp-table th, .cmp-table td{border:1px solid var(--s2);padding:8px 12px;text-align:left;white-space:nowrap;vertical-align:top}
+.cmp-table td.cmp-multiline{white-space:normal;max-width:220px}
+.cmp-row-lbl{position:sticky;left:0;background:var(--s1);font-weight:500;color:var(--t2);z-index:2;min-width:120px}
+.cmp-sec-row td{background:var(--s2);font-weight:600;color:var(--t1);font-size:11px;letter-spacing:.03em}
+.cmp-sec-row .cmp-row-lbl{background:var(--s2)}
+.cmp-col-head{min-width:190px;background:var(--s0)}
+.cmp-photo{width:170px;height:110px;background-size:cover;background-position:center;border-radius:var(--r2);background-color:var(--s1)}
+.cmp-tagchips{display:flex;flex-wrap:wrap;gap:3px}
+.cmp-foot{font-size:10px;color:var(--t3);line-height:1.7;padding:12px 0 0}
+@media print {
+  body *{visibility:hidden}
+  .compare-view, .compare-view *{visibility:visible}
+  .compare-view{position:absolute;inset:0;background:#fff}
+  .cmp-head button{display:none}
+  .cmp-body{overflow:visible}
+  @page{size:A3 landscape;margin:10mm}
+}
 .lightbox{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s;overflow:hidden;touch-action:none}
 .lightbox.open{opacity:1;pointer-events:auto}
 .lightbox img{max-width:92vw;max-height:92vh;user-select:none;cursor:grab;transform-origin:center center;will-change:transform}
@@ -455,6 +491,14 @@ tr:hover td{background:var(--hi)}
       </button>
     </div>
 
+    <!-- 比較バー（1件以上選択中のみ表示） -->
+    <div class="compare-bar" id="compareBar" style="display:none">
+      <span id="compareCount">0件選択中</span>
+      <span class="compare-bar-sep"></span>
+      <button class="compare-bar-clear" onclick="clearCompare()">選択解除</button>
+      <button class="compare-bar-go" onclick="openCompareView()">比較表を開く</button>
+    </div>
+
     <!-- GALLERY -->
     <div class="gallery" id="vg">
       <div class="loading-state" style="grid-column:1/-1">
@@ -469,6 +513,7 @@ tr:hover td{background:var(--hi)}
         <table>
           <thead>
             <tr>
+              <th style="width:30px"></th>
               <th style="width:46px">—</th>
               <th>施設名</th>
               <th>住所</th>
@@ -479,7 +524,7 @@ tr:hover td{background:var(--hi)}
             </tr>
           </thead>
           <tbody id="tableBody">
-            <tr><td colspan="7" style="text-align:center;color:var(--t3);padding:24px">読込中…</td></tr>
+            <tr><td colspan="8" style="text-align:center;color:var(--t3);padding:24px">読込中…</td></tr>
           </tbody>
         </table>
       </div>
@@ -569,6 +614,25 @@ tr:hover td{background:var(--hi)}
       <button class="cfg-btn cfg-btn-save" id="regSaveBtn" onclick="submitNewFacility()">登録してBoxに保存</button>
     </div>
   </div>
+</div>
+
+<!-- ═══ 比較表（全画面） ═══ -->
+<div class="compare-view" id="compareView">
+  <div class="cmp-head">
+    <div class="cmp-head-ttl">施設比較表</div>
+    <div class="cmp-head-sub" id="cmpCount">0件</div>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button class="dp-btn dp-btn-sec" onclick="printCompareView()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        PDF出力（印刷）
+      </button>
+      <button class="dp-btn dp-btn-sec" onclick="closeCompareView()">
+        <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        閉じる
+      </button>
+    </div>
+  </div>
+  <div class="cmp-body" id="cmpBody"></div>
 </div>
 
 <!-- ═══ ライトボックス（拡大表示・ホイールでズーム・ドラッグでパン） ═══ -->
@@ -1439,6 +1503,161 @@ function toiletChipColorClass(key) {
 let DB = { facilities: [], bfud: {}, survey: {} };
 let filteredData = [];
 let currentDetailCode = null;
+const compareSet = new Set(); // 比較表用に選択中の施設コード
+const COMPARE_MAX = 10; // 最大選択件数（当初構想の初期値を踏襲）
+
+function toggleCompare(code) {
+  if (compareSet.has(code)) {
+    compareSet.delete(code);
+  } else {
+    if (compareSet.size >= COMPARE_MAX) { alert(`比較表は最大${COMPARE_MAX}件までです`); return; }
+    compareSet.add(code);
+  }
+  renderGallery();
+  renderTable();
+  updateCompareBar();
+}
+
+function clearCompare() {
+  compareSet.clear();
+  renderGallery();
+  renderTable();
+  updateCompareBar();
+}
+
+function updateCompareBar() {
+  const bar = document.getElementById('compareBar');
+  const cnt = document.getElementById('compareCount');
+  if (compareSet.size > 0) {
+    bar.style.display = 'flex';
+    cnt.textContent = `${compareSet.size}件選択中（最大${COMPARE_MAX}件）`;
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+/* ══════════════════════════════════════════
+   比較表（全画面）
+══════════════════════════════════════════ */
+function cmpSecRow(label) {
+  return `<tr class="cmp-sec-row"><td class="cmp-row-lbl">${escHtml(label)}</td></tr>`;
+}
+function cmpRow(label, cells) {
+  return `<tr><td class="cmp-row-lbl">${escHtml(label)}</td>${cells.map(c => `<td>${c}</td>`).join('')}</tr>`;
+}
+function cmpRowHtml(label, htmlCells) {
+  return `<tr><td class="cmp-row-lbl">${escHtml(label)}</td>${htmlCells.map(c => `<td class="cmp-multiline">${c}</td>`).join('')}</tr>`;
+}
+
+function openCompareView() {
+  if (compareSet.size < 2) { alert('比較には2件以上選択してください'); return; }
+  const facilities = DB.facilities.filter(f => compareSet.has(f.Title));
+  document.getElementById('cmpCount').textContent = `${facilities.length}件`;
+
+  // トイレ設備：全施設の大分類・中分類を横断して行の一覧を作る（共用→男子→女子の順）
+  const toiletRowKeys = []; // [{major, minor}]
+  TOILET_MAJOR_CATS.forEach(major => {
+    const seen = new Set();
+    facilities.forEach(f => {
+      (f.toilets || []).forEach(t => {
+        const cat = (t.categories || {})[major];
+        if (!cat) return;
+        Object.keys(cat).forEach(minor => {
+          if (minor === TOILET_WASHIKI_KEY) return;
+          if (!seen.has(minor)) { seen.add(minor); toiletRowKeys.push({ major, minor }); }
+        });
+      });
+    });
+  });
+
+  function sumMinor(f, major, minor) {
+    let total = 0, washiki = 0, hasWashiki = false, has = false;
+    (f.toilets || []).forEach(t => {
+      const cat = (t.categories || {})[major];
+      if (!cat || cat[minor] == null) return;
+      has = true;
+      total += cat[minor];
+      if (minor === '大便器' && cat[TOILET_WASHIKI_KEY] != null) { washiki += cat[TOILET_WASHIKI_KEY]; hasWashiki = true; }
+    });
+    if (!has) return '—';
+    return hasWashiki ? `${total}<small style="color:var(--t3)">(内和式${washiki})</small>` : `${total}`;
+  }
+
+  const cols = facilities.length;
+  let html = `<table class="cmp-table"><thead><tr><th class="cmp-row-lbl" style="background:var(--s1)">項目</th>`;
+  html += facilities.map(f => `<th class="cmp-col-head">${escHtml(f.FacilityName || f.Title)}<br><span style="font-weight:400;color:var(--t3);font-size:10.5px">${escHtml(f.Title)}</span></th>`).join('');
+  html += `</tr></thead><tbody>`;
+
+  html += cmpSecRow('基本情報');
+  html += cmpRow('住所', facilities.map(f => escHtml(f.Address || '—')));
+  html += cmpRow('用途', facilities.map(f => escHtml(f.UseType || '—')));
+  html += cmpRow('竣工年', facilities.map(f => escHtml(f.CompletionDate || '不明')));
+  html += cmpRow('設計者', facilities.map(f => escHtml(f.Architect || '不明')));
+  html += cmpRow('施工者', facilities.map(f => escHtml(f.Contractor || '不明')));
+
+  html += cmpSecRow('サムネイル');
+  html += cmpRowHtml('写真', facilities.map(f => {
+    const cached = thumbCache.get(f.Title);
+    return cached ? `<div class="cmp-photo" style="background-image:url('${cached}')"></div>` : `<div class="cmp-photo"></div>`;
+  }));
+
+  html += cmpSecRow('BF・UD分類');
+  html += cmpRowHtml('該当タグ', facilities.map(f => `<div class="cmp-tagchips">${buildTags(f.Title) || '<span class="unknown">タグ未登録</span>'}</div>`));
+
+  if (toiletRowKeys.length) {
+    html += cmpSecRow('トイレ設備');
+    toiletRowKeys.forEach(({ major, minor }) => {
+      const label = major === '共用' ? minor : (major + minor);
+      html += cmpRow(label, facilities.map(f => sumMinor(f, major, minor)));
+    });
+  }
+
+  html += cmpSecRow('調査情報');
+  html += cmpRow('調査日', facilities.map(f => escHtml(fmtDate((f.survey || {}).SurveyDate) || '—')));
+  html += cmpRow('調査員', facilities.map(f => escHtml((f.survey || {}).Surveyors || '—')));
+  html += cmpRow('写真枚数', facilities.map(f => `${photoCountCache.get(f.Title) ?? ((f.survey || {}).PhotoCount || 0)}枚`));
+
+  html += cmpSecRow('参考資料');
+  html += cmpRowHtml('引用元', facilities.map(f => {
+    const refs = f.references || [];
+    if (!refs.length) return '<span class="unknown">なし</span>';
+    return refs.map(r => `${escHtml(r.name || r.url || '')}${r.acquiredDate ? `<br><small style="color:var(--t3)">取得日：${escHtml(r.acquiredDate)}</small>` : ''}`).join('<hr style="border:none;border-top:1px solid var(--s2);margin:4px 0">');
+  }));
+
+  html += `</tbody></table>`;
+
+  // 脚注（引用元URL・取得日・著作権注記を自動付与）
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const anyRefs = facilities.some(f => (f.references || []).length);
+  html += `<div class="cmp-foot">
+    ※本比較表は建築技術課「建築事例DB」より ${escHtml(todayStr)} に出力。トイレ設備数量は現地調査時点の記録に基づく。
+    ${anyRefs ? '※参考資料の著作権は各権利者に帰属する。引用元・取得日は各資料欄に記載。' : ''}
+  </div>`;
+
+  document.getElementById('cmpBody').innerHTML = html;
+  document.getElementById('compareView').classList.add('open');
+
+  // サムネ未取得の施設があれば非同期で取得しプレビューに反映
+  facilities.forEach(f => {
+    if (!thumbCache.get(f.Title) && f.boxFolderId) {
+      getThumbUrl(f).then(url => {
+        if (!url || !document.getElementById('compareView').classList.contains('open')) return;
+        document.querySelectorAll('.cmp-photo').forEach((el, i) => {
+          if (facilities[i] && facilities[i].Title === f.Title) el.style.backgroundImage = `url("${url}")`;
+        });
+      });
+    }
+  });
+}
+
+function closeCompareView() {
+  document.getElementById('compareView').classList.remove('open');
+}
+
+function printCompareView() {
+  window.print();
+}
+
 let currentFilter = 'all';
 
 async function loadData() {
@@ -1457,7 +1676,7 @@ async function loadData() {
           初回のみ接続設定が必要です。設定後はログイン状態が自動維持されます。<br>
           <button onclick="openConfig()" style="margin-top:10px;padding:6px 14px;border-radius:6px;background:var(--primary);color:#fff;border:none;cursor:pointer;font-size:11px">Box接続設定を開く</button>
         </div>`;
-      tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:24px">未接続</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--t3);padding:24px">未接続</td></tr>`;
       return;
     }
     document.getElementById('apiBanner').style.display = 'none';
@@ -1528,7 +1747,7 @@ async function loadData() {
         ${authErr ? '接続設定からログインしてください。' : escHtml(err.message)}<br><br>
         <button onclick="openConfig()" style="margin-top:10px;padding:6px 14px;border-radius:6px;background:var(--primary);color:#fff;border:none;cursor:pointer;font-size:11px">Box接続設定を開く</button>
       </div>`;
-    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:24px">接続エラー</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--t3);padding:24px">接続エラー</td></tr>`;
   }
 }
 
@@ -1671,6 +1890,9 @@ function renderGallery() {
         <div class="gcnt" data-photocount-for="${escHtml(f.Title)}">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>${photoCnt}
         </div>
+        <div class="gcmp${compareSet.has(f.Title) ? ' on' : ''}" onclick="event.stopPropagation();toggleCompare('${escHtml(f.Title)}')" title="比較表に追加/削除">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
         ${tagsOv ? `<div class="gtags-ov">${tagsOv}</div>` : ''}
       </div>
       <div class="gbody">
@@ -1690,7 +1912,7 @@ function renderGallery() {
 function renderTable() {
   const tbody = document.getElementById('tableBody');
   if (!filteredData.length) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:24px">該当なし</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--t3);padding:24px">該当なし</td></tr>`;
     return;
   }
   tbody.innerHTML = filteredData.map(f => {
@@ -1699,6 +1921,7 @@ function renderTable() {
     const tags = buildTags(f.Title);
     return `
     <tr onclick="openDetail('${escHtml(f.Title)}')">
+      <td onclick="event.stopPropagation()"><input type="checkbox" class="tcmp" ${compareSet.has(f.Title) ? 'checked' : ''} onclick="toggleCompare('${escHtml(f.Title)}')"></td>
       <td><div class="thm" data-thumb-for="${escHtml(f.Title)}"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div></td>
       <td><div class="tn">${escHtml(f.FacilityName || f.Title)}</div><div class="tsb">${escHtml(f.Title)}</div></td>
       <td style="color:var(--t3);font-size:11px">${escHtml(f.Address || '')}</td>
