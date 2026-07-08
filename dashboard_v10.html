@@ -169,7 +169,7 @@ input{font-family:inherit;color:inherit}
 .gtl{font-size:11px;color:var(--t3);display:flex;flex-direction:column;gap:2px}
 .gtl-row{display:flex;align-items:baseline;gap:0}
 .gtl-row-items{display:flex;flex-wrap:wrap;gap:0}
-.gtl-item{white-space:nowrap}
+.gtl-item{white-space:normal}
 .gtl-major{font-weight:600;color:var(--t2);white-space:nowrap;flex:0 0 34px}
 .gtl-major::after{content:'：'}
 .gtl-item:not(:last-child)::after{content:'・';color:var(--t3)}
@@ -509,7 +509,7 @@ tr:hover td{background:var(--hi)}
         <div class="fc fc-tdm" onclick="setFilter(this,'daremo')">だれでも <span class="fc-badge" id="fcDaremo">—</span></div>
         <div class="fc fc-tfm" onclick="setFilter(this,'oyako')">親子 <span class="fc-badge" id="fcOyako">—</span></div>
         <div class="fc fc-tbf" onclick="setFilter(this,'ostomy')">オストメイト <span class="fc-badge" id="fcOstomy">—</span></div>
-        <div class="fc fc-tud" onclick="setFilter(this,'lgbtq')">LGBTQ <span class="fc-badge" id="fcLgbtq">—</span></div>
+        <div class="fc fc-tud" onclick="setFilter(this,'mixed')">男女共用 <span class="fc-badge" id="fcMixed">—</span></div>
       </div>
       <button class="new-reg-btn" onclick="openReg()">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -833,7 +833,7 @@ const TOILET_MAJOR_CATS = ['共用', '男子', '女子'];
 const TOILET_MINOR_CATS = {
   '男子': ['大便器', '小便器', '洗面', 'オストメイト', 'パウダー'],
   '女子': ['大便器', '洗面', 'オストメイト', 'パウダー'],
-  '共用': ['だれでも', '多機能', 'ファミリー', '授乳室・おむつ交換', 'オストメイト']
+  '共用': ['だれでも', '多機能', 'ファミリー', '男女共用', '授乳室・おむつ交換', 'オストメイト']
 };
 const TOILET_WASHIKI_KEY = '大便器_和式内数'; // 大便器の内数（和式）専用キー
 
@@ -1520,21 +1520,22 @@ const TAG_MAP = {
   TagDaremo: {label:'だれでもトイレ', cls:'tdm'},
   TagOyako: {label:'親子トイレ', cls:'tfm'},
   TagOstomy: {label:'オストメイト', cls:'tbf'},
-  TagLGBTQ: {label:'LGBTQ配慮', cls:'tud'},
+  TagMixed: {label:'男女共用', cls:'tud'},
 };
 
 // トイレ設備の区分名 → BF・UDタグ判定キーワード（一般トイレ項目は判定対象外）
 const TAG_KEYWORDS = {
-  TagDaremo: ['だれでも', '多機能', 'ファミリー', '男女共用', 'LGBTQ'],
-  TagOyako:  ['ファミリー', '小児用', '子供用'],
+  TagDaremo: ['だれでも', '多機能'],
+  TagOyako:  ['ファミリー', '幼児用', '子供用'],
   TagOstomy: ['オストメイト'],
-  TagLGBTQ:  ['男女共用']
+  TagMixed:  ['だれでも', '多機能', 'ファミリー', '男女共用']
 };
 
 // トイレ設備チップの区分名から、対応する絞り込みチップと同じ色クラスを判定
 function toiletChipColorClass(key) {
   if (TAG_KEYWORDS.TagOstomy.some(kw => key.includes(kw))) return 'tbf';
   if (TAG_KEYWORDS.TagOyako.some(kw => key.includes(kw))) return 'tfm';
+  if (key.includes('男女共用')) return 'tud';
   if (TAG_KEYWORDS.TagDaremo.some(kw => key.includes(kw))) return 'tdm';
   return '';
 }
@@ -1876,7 +1877,7 @@ async function loadData() {
         TagDaremo: has(TAG_KEYWORDS.TagDaremo),
         TagOyako:  has(TAG_KEYWORDS.TagOyako),
         TagOstomy: has(TAG_KEYWORDS.TagOstomy),
-        TagLGBTQ:  has(TAG_KEYWORDS.TagLGBTQ)
+        TagMixed:  has(TAG_KEYWORDS.TagMixed)
       };
     }
 
@@ -1890,7 +1891,7 @@ async function loadData() {
         TagDaremo:  !!manual.TagDaremo  || auto.TagDaremo,
         TagOyako:   !!manual.TagOyako   || auto.TagOyako,
         TagOstomy:  !!manual.TagOstomy  || auto.TagOstomy,
-        TagLGBTQ:   !!manual.TagLGBTQ   || auto.TagLGBTQ,
+        TagMixed:   !!manual.TagMixed   || auto.TagMixed,
         TagCustom:  manual.TagCustom || ''
       };
       if (f.survey) DB.survey[f.Title] = f.survey;
@@ -1903,13 +1904,13 @@ async function loadData() {
     const daremo = DB.facilities.filter(f => DB.bfud[f.Title]?.TagDaremo).length;
     const oyako  = DB.facilities.filter(f => DB.bfud[f.Title]?.TagOyako).length;
     const ostomy = DB.facilities.filter(f => DB.bfud[f.Title]?.TagOstomy).length;
-    const lgbtq  = DB.facilities.filter(f => DB.bfud[f.Title]?.TagLGBTQ).length;
+    const mixed  = DB.facilities.filter(f => DB.bfud[f.Title]?.TagMixed).length;
 
     document.getElementById('fcAll').textContent = total;
     document.getElementById('fcDaremo').textContent = daremo;
     document.getElementById('fcOyako').textContent = oyako;
     document.getElementById('fcOstomy').textContent = ostomy;
-    document.getElementById('fcLgbtq').textContent = lgbtq;
+    document.getElementById('fcMixed').textContent = mixed;
     document.getElementById('nbTotal').textContent = total;
 
     // フィルタ適用して描画
@@ -1955,7 +1956,7 @@ function applyFilter() {
     if (currentFilter === 'all') return true;
     const bf = DB.bfud[f.Title];
     if (!bf) return false;
-    const map = { daremo:'TagDaremo', oyako:'TagOyako', ostomy:'TagOstomy', lgbtq:'TagLGBTQ' };
+    const map = { daremo:'TagDaremo', oyako:'TagOyako', ostomy:'TagOstomy', mixed:'TagMixed' };
     return !!bf[map[currentFilter]];
   });
 
