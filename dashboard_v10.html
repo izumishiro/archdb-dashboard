@@ -859,8 +859,10 @@ const TOILET_WASHIKI_KEY = '大便器_和式内数'; // 大便器の内数（和
 // ・共用の各中分類に付与可能な内訳
 // ・男子/女子の「大型」「オストメイト」に付与可能な内訳
 const TOILET_SUBCATS_COMMON = ['車椅子回転スペース', 'ベッド', 'オストメイト設備', '授乳台', 'おむつ交換台', '手洗い器', 'フィッティングボード'];
+const TOILET_SUBCATS_FAMILY = [...TOILET_SUBCATS_COMMON, '幼児用（小）トイレ', '幼児用（大）トイレ'];
 const TOILET_SUBCATS_OGATA  = ['簡易車椅子便房', 'オストメイト設備', 'おむつ交換台', '手洗い器', 'フィッティングボード', '洗髪台', '幼児用便器', '歯磨き'];
 function subcatsFor(major, minor) {
+  if (major === '共用' && minor === 'ファミリー') return TOILET_SUBCATS_FAMILY;
   if (major === '共用') return TOILET_SUBCATS_COMMON;
   if (minor === '大型（内数）' || minor === 'オストメイト') return TOILET_SUBCATS_OGATA;
   return null; // 小分類を持たない中分類
