@@ -260,7 +260,13 @@ tr:hover td{background:var(--hi)}
 .reg-minor-rows{display:flex;flex-direction:column;gap:5px}
 .reg-minor-row{display:flex;align-items:center;gap:7px}
 .reg-minor-row-wrap{display:flex;flex-direction:column;gap:4px}
-.reg-subcats{display:flex;flex-wrap:wrap;gap:4px 10px;padding:2px 0 4px 74px}
+.reg-minor-row-head{display:flex;align-items:baseline;gap:8px}
+.reg-minor-hint{font-size:9.5px;color:var(--t3)}
+.reg-instances{display:flex;flex-direction:column;gap:6px;padding-left:4px}
+.reg-instance{border:1px dashed var(--s3);border-radius:6px;padding:6px 8px;background:var(--s0)}
+.reg-instance-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.reg-instance-no{font-size:10px;font-weight:600;color:var(--t2)}
+.reg-subcats{display:flex;flex-wrap:wrap;gap:4px 10px;padding:2px 0 4px 0}
 .reg-subcat-chk{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--t2);cursor:pointer;white-space:nowrap}
 .reg-subcat-chk input{width:12px;height:12px;accent-color:var(--primary);cursor:pointer}
 .reg-minor-lbl{font-size:11.5px;color:var(--t1);width:64px;flex-shrink:0}
@@ -321,7 +327,8 @@ tr:hover td{background:var(--hi)}
 .dp-toilet-counts{display:flex;flex-wrap:wrap;gap:6px}
 .dp-toilet-chip small{opacity:.75;margin-left:3px;font-weight:400}
 .dp-toilet-chip{font-size:11px;background:var(--s1);border:1px solid var(--s2);border-radius:6px;padding:4px 9px;color:var(--t1);display:flex;align-items:center;gap:5px}
-.dp-toilet-sub{display:inline-flex;flex-wrap:wrap;gap:3px;margin:2px 0 2px 4px}
+.dp-toilet-sub{display:flex;flex-wrap:wrap;align-items:center;gap:3px;margin:2px 0 2px 4px}
+.dp-toilet-sub-no{font-size:9.5px;color:var(--t3);font-weight:600;margin-right:2px}
 .dp-toilet-subchip{font-size:9.5px;background:none;border:1px dashed var(--s3);border-radius:99px;padding:1px 7px;color:var(--t3)}
 .dp-toilet-chip b{color:var(--primary);font-weight:600}
 .dp-toilet-chip.tdm{background:var(--cdm);border-color:var(--cdm);color:var(--fdm)}
@@ -619,11 +626,16 @@ tr:hover td{background:var(--hi)}
         <div class="cfg-field"><div class="cfg-lbl">竣工年</div><input class="cfg-input" id="regYear" placeholder="2020"></div>
         <div class="cfg-field"><div class="cfg-lbl">設計者</div><input class="cfg-input" id="regArch" placeholder="不明なら空欄"></div>
         <div class="cfg-field"><div class="cfg-lbl">施工者</div><input class="cfg-input" id="regCont" placeholder="不明なら空欄"></div>
-        <div class="cfg-field reg-fw"><div class="cfg-lbl">Box フォルダURL</div><input class="cfg-input" id="regBoxUrl" placeholder="https://xxx.app.box.com/folder/123456789"></div>
         <div class="cfg-field"><div class="cfg-lbl">調査日</div><input class="cfg-input" id="regDate" type="date"></div>
         <div class="cfg-field reg-fw"><div class="cfg-lbl">調査員</div><input class="cfg-input" id="regSurveyors" placeholder="氏名（複数は・区切り）"></div>
         <div class="cfg-field reg-fw"><div class="cfg-lbl">調査員所見</div><textarea class="cfg-input" id="regRemarksSurvey" rows="2" style="height:auto;padding:8px 11px;resize:vertical" placeholder="現地調査時の所見・気づき等"></textarea></div>
         <div class="cfg-field reg-fw"><div class="cfg-lbl">備考</div><textarea class="cfg-input" id="regRemarks" rows="2" style="height:auto;padding:8px 11px;resize:vertical" placeholder="その他の備考"></textarea></div>
+      </div>
+
+      <div class="cfg-field">
+        <div class="cfg-lbl">Box 写真フォルダURL（元写真が複数フォルダに分かれている場合は複数登録できる）</div>
+        <div id="regBoxUrls"></div>
+        <button class="reg-mini-btn" style="align-self:flex-start" onclick="regAddBoxUrl()">＋ フォルダを追加</button>
       </div>
 
       <div class="cfg-field">
@@ -638,9 +650,9 @@ tr:hover td{background:var(--hi)}
         <button class="reg-mini-btn" style="align-self:flex-start" onclick="regAddRef()">＋ 資料を追加</button>
       </div>
 
-      <div class="cfg-field">
-        <div class="cfg-lbl">平面図（Box上の画像ファイルURL。取得できない場合は空欄でOK）</div>
-        <input class="cfg-input" id="regDrawingUrl" placeholder="https://xxx.app.box.com/file/123456789">
+      <div class="cfg-grid">
+        <div class="cfg-field"><div class="cfg-lbl">平面図ファイルURL（1点のみの場合）</div><input class="cfg-input" id="regDrawingUrl" placeholder="https://xxx.app.box.com/file/123456789"></div>
+        <div class="cfg-field"><div class="cfg-lbl">平面図フォルダURL（drawings/等・自動検出）</div><input class="cfg-input" id="regDrawingFolderUrl" placeholder="https://xxx.app.box.com/folder/123456789"></div>
       </div>
     </div>
     <div class="cfg-foot">
@@ -845,16 +857,31 @@ const TOILET_WASHIKI_KEY = '大便器_和式内数'; // 大便器の内数（和
 
 // 小分類（チェック式内訳）：数量は伴わず有無のみを記録する
 // ・共用の各中分類に付与可能な内訳
-// ・男子/女子の「大型」に付与可能な内訳
+// ・男子/女子の「大型」「オストメイト」に付与可能な内訳
 const TOILET_SUBCATS_COMMON = ['車椅子回転スペース', 'ベッド', 'オストメイト設備', '授乳台', 'おむつ交換台', '手洗い器', 'フィッティングボード'];
 const TOILET_SUBCATS_OGATA  = ['簡易車椅子便房', 'オストメイト設備', 'おむつ交換台', '手洗い器', 'フィッティングボード', '洗髪台', '幼児用便器', '歯磨き'];
 function subcatsFor(major, minor) {
   if (major === '共用') return TOILET_SUBCATS_COMMON;
-  if (minor === '大型（内数）') return TOILET_SUBCATS_OGATA;
+  if (minor === '大型（内数）' || minor === 'オストメイト') return TOILET_SUBCATS_OGATA;
   return null; // 小分類を持たない中分類
 }
-function minorCount(val) { return (val && typeof val === 'object') ? (val.count || 0) : (Number(val) || 0); }
-function minorSub(val) { return (val && typeof val === 'object' && Array.isArray(val.sub)) ? val.sub : []; }
+
+// 中分類の値を「設置インスタンスの配列」に正規化する。
+// 同じ中分類が複数室あり、それぞれ設備構成が異なるケース（多機能・男女共用・大型・オストメイト等）に対応するため、
+// 1室＝1インスタンス（{sub:[小分類名,...]}）として扱う。古い形式（数値／{count,sub}）も自動変換する。
+function minorInstances(val) {
+  if (val == null) return [];
+  if (Array.isArray(val)) return val.map(v => ({ sub: Array.isArray(v && v.sub) ? v.sub : [] }));
+  if (typeof val === 'object') {
+    const n = val.count || 0;
+    const sub = Array.isArray(val.sub) ? val.sub : [];
+    return Array.from({ length: n }, () => ({ sub: [...sub] }));
+  }
+  const n = Number(val) || 0;
+  return Array.from({ length: n }, () => ({ sub: [] }));
+}
+function minorCount(val) { return minorInstances(val).length; }
+function minorSub(val) { return minorInstances(val).flatMap(inst => inst.sub); } // 旧互換：全インスタンスの小分類をまとめて返す
 
 function nextFacilityCode() {
   const nums = DB.facilities
@@ -882,10 +909,32 @@ function regSubcatChecksHtml(major, minor, selected) {
     </label>`).join('')}</div>`;
 }
 
-function regMinorRowHtml(major, minor, val, washikiVal) {
-  const count = minorCount(val);
-  const sub = minorSub(val);
+// 設置インスタンス1件分（多機能・男女共用・大型・オストメイト等、複数室で設備構成が異なりうる中分類用）
+function regInstanceBlockHtml(major, minor, index, sub) {
   const subHtml = regSubcatChecksHtml(major, minor, sub);
+  return `<div class="reg-instance">
+    <div class="reg-instance-head">
+      <span class="reg-instance-no">${index}室目</span>
+      <button class="reg-del" onclick="this.closest('.reg-instance').remove()" title="この設置を削除">×</button>
+    </div>
+    ${subHtml}
+  </div>`;
+}
+
+function regRenumberInstances(wrapEl) {
+  wrapEl.querySelectorAll('.reg-instance').forEach((el, i) => {
+    const noEl = el.querySelector('.reg-instance-no');
+    if (noEl) noEl.textContent = `${i + 1}室目`;
+  });
+}
+
+function regAddInstance(btn, major, minor) {
+  const wrap = btn.previousElementSibling; // .reg-instances
+  const index = wrap.querySelectorAll('.reg-instance').length + 1;
+  wrap.insertAdjacentHTML('beforeend', regInstanceBlockHtml(major, minor, index, []));
+}
+
+function regMinorRowHtml(major, minor, val, washikiVal) {
   if (minor === '大便器') {
     return `<div class="reg-minor-row" data-minor="大便器" data-major="${escHtml(major)}">
       <span class="reg-minor-lbl">大便器</span>
@@ -894,12 +943,28 @@ function regMinorRowHtml(major, minor, val, washikiVal) {
       <input class="cfg-input reg-washiki-input" type="number" placeholder="0" data-washiki-val value="${washikiVal != null ? washikiVal : ''}">
     </div>`;
   }
+
+  const subcatOpts = subcatsFor(major, minor);
+  if (subcatOpts) {
+    // 複数設置対応：室ごとに設備構成（小分類）を個別入力できる
+    const instances = minorInstances(val);
+    const instancesHtml = instances.map((inst, i) => regInstanceBlockHtml(major, minor, i + 1, inst.sub)).join('');
+    return `<div class="reg-minor-row-wrap" data-minor="${escHtml(minor)}" data-major="${escHtml(major)}" data-multi="1">
+      <div class="reg-minor-row-head">
+        <span class="reg-minor-lbl">${escHtml(minor)}</span>
+        <span class="reg-minor-hint">室単位で追加（設備が室ごとに異なる場合）</span>
+      </div>
+      <div class="reg-instances">${instancesHtml}</div>
+      <button class="reg-mini-btn reg-mini-btn-sm" onclick="regAddInstance(this, '${escHtml(major)}', '${escHtml(minor)}')">＋ ${escHtml(minor)}を1室追加</button>
+    </div>`;
+  }
+
+  // 小分類を持たない通常の数量のみ項目
   return `<div class="reg-minor-row-wrap" data-minor="${escHtml(minor)}" data-major="${escHtml(major)}">
     <div class="reg-minor-row">
       <span class="reg-minor-lbl">${escHtml(minor)}</span>
       <input class="cfg-input reg-minor-input" type="number" placeholder="数量" data-minor-val value="${val != null ? (typeof val === 'object' ? (val.count != null ? val.count : '') : val) : ''}">
     </div>
-    ${subHtml}
   </div>`;
 }
 
@@ -950,6 +1015,16 @@ function regAddRef() {
   document.getElementById('regRefs').insertAdjacentHTML('beforeend', regRefRowHtml('', '', ''));
 }
 
+function regBoxUrlRowHtml(url) {
+  return `<div class="reg-row reg-boxurl-row">
+    <input class="cfg-input" placeholder="https://xxx.app.box.com/folder/123456789" value="${escHtml(url || '')}">
+    <button class="reg-del" onclick="this.parentElement.remove()" title="この行を削除">×</button>
+  </div>`;
+}
+function regAddBoxUrl() {
+  document.getElementById('regBoxUrls').insertAdjacentHTML('beforeend', regBoxUrlRowHtml(''));
+}
+
 let regEditCode = null; // null=新規登録、値あり=編集対象の施設コード
 
 function openReg(code) {
@@ -973,7 +1048,10 @@ function openReg(code) {
     document.getElementById('regYear').value = f.CompletionDate || '';
     document.getElementById('regArch').value = f.Architect || '';
     document.getElementById('regCont').value = f.Contractor || '';
-    document.getElementById('regBoxUrl').value = f.boxFolderId ? `https://app.box.com/folder/${f.boxFolderId}` : '';
+    const folderIds = getFolderIds(f);
+    document.getElementById('regBoxUrls').innerHTML = folderIds.length
+      ? folderIds.map(id => regBoxUrlRowHtml(`https://app.box.com/folder/${id}`)).join('')
+      : regBoxUrlRowHtml('');
     const sv = f.survey || {};
     document.getElementById('regDate').value = sv.SurveyDate || '';
     document.getElementById('regSurveyors').value = sv.Surveyors || '';
@@ -982,6 +1060,7 @@ function openReg(code) {
     const locs = (f.toilets && f.toilets.length) ? f.toilets : [{ location: '', categories: {} }];
     document.getElementById('regLocs').innerHTML = locs.map(l => regLocationHtml(l.location, l.categories)).join('');
     document.getElementById('regDrawingUrl').value = f.drawingFileId ? `https://app.box.com/file/${f.drawingFileId}` : '';
+    document.getElementById('regDrawingFolderUrl').value = f.drawingFolderId ? `https://app.box.com/folder/${f.drawingFolderId}` : '';
     const refs = f.references || [];
     document.getElementById('regRefs').innerHTML = refs.length
       ? refs.map(r => regRefRowHtml(r.name, r.url, r.acquiredDate)).join('')
@@ -991,8 +1070,9 @@ function openReg(code) {
     saveBtn.textContent = '登録してBoxに保存';
     codeInput.disabled = false;
     codeInput.value = nextFacilityCode();
-    ['regName','regAddr','regUse','regYear','regArch','regCont','regBoxUrl','regDate','regSurveyors','regDrawingUrl','regRemarksSurvey','regRemarks']
+    ['regName','regAddr','regUse','regYear','regArch','regCont','regDate','regSurveyors','regDrawingUrl','regDrawingFolderUrl','regRemarksSurvey','regRemarks']
       .forEach(id => document.getElementById(id).value = '');
+    document.getElementById('regBoxUrls').innerHTML = regBoxUrlRowHtml('');
     document.getElementById('regLocs').innerHTML = regLocationHtml('', {});
     document.getElementById('regRefs').innerHTML = '';
   }
@@ -1036,14 +1116,18 @@ async function submitNewFacility() {
       const cat = {};
       majorEl.querySelectorAll('.reg-minor-rows > [data-minor]').forEach(unit => {
         const minor = unit.dataset.minor;
-        const valInput = unit.querySelector('[data-minor-val]');
-        const v = valInput.value.trim();
-        const subChecked = Array.from(unit.querySelectorAll('.reg-subcat-chk input:checked')).map(i => i.value);
-        if (v !== '') {
-          cat[minor] = subChecked.length ? { count: Number(v), sub: subChecked } : Number(v);
-        } else if (subChecked.length) {
-          cat[minor] = { count: 0, sub: subChecked }; // 数量未入力でも小分類が選択されていれば記録
+        if (unit.dataset.multi === '1') {
+          // 複数設置対応：室ごとの小分類をインスタンス配列として収集
+          const instances = Array.from(unit.querySelectorAll('.reg-instance')).map(instEl => ({
+            sub: Array.from(instEl.querySelectorAll('.reg-subcat-chk input:checked')).map(i => i.value)
+          }));
+          if (instances.length) cat[minor] = instances;
+          return;
         }
+        const valInput = unit.querySelector('[data-minor-val]');
+        if (!valInput) return;
+        const v = valInput.value.trim();
+        if (v !== '') cat[minor] = Number(v);
         const washikiInput = unit.querySelector('[data-washiki-val]');
         if (washikiInput) {
           const wv = washikiInput.value.trim();
@@ -1077,6 +1161,10 @@ async function submitNewFacility() {
   }
 
   const drawingFileId = extractBoxFileId(document.getElementById('regDrawingUrl').value.trim());
+  const drawingFolderId = extractBoxFolderId(document.getElementById('regDrawingFolderUrl').value.trim());
+  const boxFolderIds = Array.from(document.querySelectorAll('#regBoxUrls .reg-boxurl-row input'))
+    .map(i => extractBoxFolderId(i.value.trim()))
+    .filter(Boolean);
 
   const existing = isEdit ? DB.facilities.find(f => f.Title === regEditCode) : null;
 
@@ -1088,8 +1176,10 @@ async function submitNewFacility() {
     CompletionDate: document.getElementById('regYear').value.trim(),
     Architect: document.getElementById('regArch').value.trim(),
     Contractor: document.getElementById('regCont').value.trim(),
-    boxFolderId: extractBoxFolderId(document.getElementById('regBoxUrl').value.trim()),
+    boxFolderIds,
+    boxFolderId: boxFolderIds[0] || '', // 旧形式との互換のため先頭フォルダを保持
     drawingFileId,
+    drawingFolderId,
     references,
     Remarks: document.getElementById('regRemarks').value.trim(),
     bfud: (existing && existing.bfud) || { TagCustom: '' },
@@ -1376,6 +1466,19 @@ async function getImageBlobUrl(fileId) {
   return url;
 }
 
+// 平面図の解決：drawingFileId（単一ファイル）を優先し、無ければdrawingFolderId配下から自動検出する
+function hasDrawing(f) { return !!(f.drawingFileId || f.drawingFolderId); }
+async function resolveDrawingUrl(f) {
+  if (f.drawingFileId) return getImageBlobUrl(f.drawingFileId);
+  if (f.drawingFolderId) {
+    const files = await listImageFiles(f.drawingFolderId);
+    if (!files.length) return null;
+    const preferred = files.find(x => /平面図|図面|floor|plan/i.test(x.name));
+    return getImageBlobUrl((preferred || files[0]).id);
+  }
+  return null;
+}
+
 const folderListCache = new Map(); // folderId -> Promise<files[]>（同一フォルダの重複API呼び出しを防止）
 function listImageFiles(folderId) {
   if (!folderListCache.has(folderId)) {
@@ -1388,6 +1491,21 @@ function listImageFiles(folderId) {
     })());
   }
   return folderListCache.get(folderId);
+}
+
+// 施設に紐づく写真フォルダID一覧を取得（新形式 boxFolderIds を優先、旧形式 boxFolderId にも対応）
+function getFolderIds(f) {
+  if (Array.isArray(f.boxFolderIds) && f.boxFolderIds.length) return f.boxFolderIds;
+  if (f.boxFolderId) return [f.boxFolderId];
+  return [];
+}
+
+// 施設に紐づく全フォルダの画像ファイルを横断して取得（元写真が複数フォルダに分かれている場合に対応）
+async function listImageFilesForFacility(f) {
+  const ids = getFolderIds(f);
+  if (!ids.length) return [];
+  const lists = await Promise.all(ids.map(id => listImageFiles(id).catch(() => [])));
+  return lists.flat();
 }
 
 /* ══════════════════════════════════════════
@@ -1408,9 +1526,9 @@ async function getThumbUrl(f) {
       console.warn('プレビュー画像取得失敗。元フォルダから再取得します', f.Title, e.message);
     }
   }
-  if (!f.boxFolderId) { thumbCache.set(f.Title, null); return null; }
+  if (!getFolderIds(f).length) { thumbCache.set(f.Title, null); return null; }
   try {
-    const files = await listImageFiles(f.boxFolderId);
+    const files = await listImageFilesForFacility(f);
     if (!files.length) { thumbCache.set(f.Title, null); return null; }
     const preferred = files.find(x => /サムネ|thumb/i.test(x.name));
     const fileId = (preferred || files[0]).id;
@@ -1435,7 +1553,7 @@ function applyThumbToCards(title, url) {
 
 function hydrateThumbs(list) {
   list.forEach(f => {
-    if (!f.boxFolderId) return;
+    if (!getFolderIds(f).length) return;
     if (thumbCache.has(f.Title)) {
       // 再描画（フィルタ切替・表示切替）で新規DOMになった分にキャッシュ済み画像を即反映
       const cached = thumbCache.get(f.Title);
@@ -1465,12 +1583,12 @@ function applyPhotoCountToCards(title, count) {
 
 function hydratePhotoCounts(list) {
   list.forEach(f => {
-    if (!f.boxFolderId) return;
+    if (!getFolderIds(f).length) return;
     if (photoCountCache.has(f.Title)) {
       applyPhotoCountToCards(f.Title, photoCountCache.get(f.Title));
       return;
     }
-    listImageFiles(f.boxFolderId).then(files => {
+    listImageFilesForFacility(f).then(files => {
       photoCountCache.set(f.Title, files.length);
       applyPhotoCountToCards(f.Title, files.length);
     }).catch(e => console.warn('写真枚数カウント失敗', f.Title, e.message));
@@ -1539,9 +1657,9 @@ let currentStripShown = STRIP_PAGE;
 
 async function loadPhotoStripForFacility(f) {
   const wrap = document.getElementById('dpStripWrap');
-  if (!f.boxFolderId) { wrap.style.display = 'none'; return; }
+  if (!getFolderIds(f).length) { wrap.style.display = 'none'; return; }
   try {
-    const files = await listImageFiles(f.boxFolderId);
+    const files = await listImageFilesForFacility(f);
     currentPhotoFiles = files;
     currentStripShown = STRIP_PAGE;
     if (!files.length) { wrap.style.display = 'none'; return; }
@@ -1700,9 +1818,9 @@ function openCompareView() {
     return photoBox;
   }).join('');
   html += `</tr>`;
-  if (facilities.some(f => f.drawingFileId)) {
+  if (facilities.some(f => hasDrawing(f))) {
     html += `<tr class="cmp-row-thumb"><td class="cmp-row-lbl cmp-lbl-merged" colspan="2"><div class="cmp-lbl-inner">平面図</div></td>`;
-    html += facilities.map(f => f.drawingFileId
+    html += facilities.map(f => hasDrawing(f)
       ? `<td class="cmp-photo-cell cmp-drawing-cell" data-drawing-for="${escHtml(f.Title)}"></td>`
       : `<td class="cmp-photo-cell cmp-drawing-cell"></td>`
     ).join('');
@@ -1772,14 +1890,15 @@ function openCompareView() {
 
   // サムネ・平面図の非同期反映
   facilities.forEach(f => {
-    if (!thumbCache.get(f.Title) && f.boxFolderId) {
+    if (!thumbCache.get(f.Title) && getFolderIds(f).length) {
       getThumbUrl(f).then(url => {
         if (!url) return;
         document.querySelectorAll(`[data-photo-for="${CSS.escape(f.Title)}"]`).forEach(el => { el.style.backgroundImage = `url("${url}")`; });
       });
     }
-    if (f.drawingFileId) {
-      getImageBlobUrl(f.drawingFileId).then(url => {
+    if (hasDrawing(f)) {
+      resolveDrawingUrl(f).then(url => {
+        if (!url) return;
         document.querySelectorAll(`[data-drawing-for="${CSS.escape(f.Title)}"]`).forEach(el => { el.style.backgroundImage = `url("${url}")`; });
       }).catch(() => {});
     }
@@ -2204,8 +2323,8 @@ function openDetail(code) {
   document.getElementById('dp-status').textContent = sv.Status || '—';
   document.getElementById('dp-photo-count').textContent = `${(photoCountCache.get(f.Title) ?? (sv.PhotoCount || 0))}枚`;
   document.getElementById('dp-photocnt').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>${(photoCountCache.get(f.Title) ?? (sv.PhotoCount || 0))}枚`;
-  if (f.boxFolderId) {
-    listImageFiles(f.boxFolderId).then(files => {
+  if (getFolderIds(f).length) {
+    listImageFilesForFacility(f).then(files => {
       photoCountCache.set(f.Title, files.length);
       if (document.getElementById('dp-code').textContent.includes(f.Title)) {
         document.getElementById('dp-photocnt').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>${files.length}枚`;
@@ -2222,7 +2341,7 @@ function openDetail(code) {
   const cached = thumbCache.get(f.Title);
   if (cached) {
     setHeroImage(cached);
-  } else if (f.boxFolderId) {
+  } else if (getFolderIds(f).length) {
     getThumbUrl(f).then(url => {
       if (url && document.getElementById('detailPanel').classList.contains('open') && document.getElementById('dp-code').textContent.includes(f.Title)) {
         setHeroImage(url);
@@ -2249,10 +2368,15 @@ function openDetail(code) {
         const catObj = cats[major];
         if (!catObj || !Object.keys(catObj).length) return '';
         const chips = Object.entries(catObj).filter(([k]) => k !== TOILET_WASHIKI_KEY).map(([k, v]) => {
-          const count = minorCount(v);
-          const subs = minorSub(v);
+          const instances = minorInstances(v);
+          const count = instances.length;
           const washiki = (k === '大便器' && catObj[TOILET_WASHIKI_KEY] != null) ? `<small>(内和式${catObj[TOILET_WASHIKI_KEY]})</small>` : '';
-          const subHtml = subs.length ? `<div class="dp-toilet-sub">${subs.map(s => `<span class="dp-toilet-subchip">${escHtml(s)}</span>`).join('')}</div>` : '';
+          // 室ごとに設備構成が異なる場合、①②…で内訳を分けて表示する
+          const subHtml = instances.some(inst => inst.sub.length)
+            ? instances.map((inst, i) => inst.sub.length
+                ? `<div class="dp-toilet-sub"><span class="dp-toilet-sub-no">${i + 1}室目：</span>${inst.sub.map(s => `<span class="dp-toilet-subchip">${escHtml(s)}</span>`).join('')}</div>`
+                : '').join('')
+            : '';
           return `<span class="dp-toilet-chip ${toiletChipColorClass(major === '共用' ? k : major + k)}">${escHtml(major === '共用' ? k : major + k)}<b>${count}</b>${washiki}</span>${subHtml}`;
         }).join('');
         return `<div class="dp-toilet-major"><span class="dp-toilet-major-lbl">${escHtml(major)}</span><div class="dp-toilet-counts">${chips}</div></div>`;
@@ -2285,12 +2409,12 @@ function openDetail(code) {
   // 平面図（写真とは別枠。取得できている場合のみ表示）
   const drawingSec = document.getElementById('dp-drawing-sec');
   const drawingEl = document.getElementById('dp-drawing');
-  if (f.drawingFileId) {
+  if (hasDrawing(f)) {
     drawingSec.style.display = 'block';
     drawingEl.style.backgroundImage = '';
     drawingEl.onclick = null;
-    getImageBlobUrl(f.drawingFileId).then(url => {
-      if (currentDetailCode !== f.Title) return;
+    resolveDrawingUrl(f).then(url => {
+      if (!url || currentDetailCode !== f.Title) return;
       drawingEl.style.backgroundImage = `url("${url}")`;
       drawingEl.onclick = () => openLightbox(url);
     }).catch(e => console.warn('平面図取得失敗', e.message));
@@ -2303,7 +2427,7 @@ function openDetail(code) {
     window.open(`https://app.box.com/folder/${BOX_ROOT_FOLDER}`, '_blank');
   };
   document.getElementById('dp-box-link').onclick = () => {
-    const fid = f.boxFolderId || BOX_ROOT_FOLDER;
+    const fid = getFolderIds(f)[0] || BOX_ROOT_FOLDER;
     window.open(`https://app.box.com/folder/${fid}`, '_blank');
   };
 
