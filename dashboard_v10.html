@@ -162,11 +162,11 @@ input{font-family:inherit;color:inherit}
 .gcmp:hover{border-color:var(--primary)}
 .gcmp.on{background:var(--primary);border-color:var(--primary)}
 .gcmp.on svg{opacity:1}
-.gbody{padding:11px 13px;flex:1 0 auto;overflow:visible}
-.gname{font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:4px;line-height:1.35;overflow-wrap:anywhere}
-.gmeta{font-size:11px;color:var(--t3);display:flex;align-items:flex-start;gap:5px;margin-bottom:8px;line-height:1.45;overflow-wrap:anywhere}
+.gbody{padding:11px 13px;flex:1 0 auto;overflow:visible;display:flex;flex-direction:column;min-height:0}
+.gname{font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:4px;line-height:1.35;overflow-wrap:anywhere;flex:0 0 auto}
+.gmeta{font-size:11px;color:var(--t3);display:flex;align-items:flex-start;gap:5px;margin-bottom:8px;line-height:1.45;overflow-wrap:anywhere;flex:0 0 auto}
 .gmeta svg{width:10px;height:10px;stroke:currentColor;flex-shrink:0;margin-top:3px}
-.gtl{font-size:11.5px;color:var(--t3);display:flex;flex-direction:column;gap:3px;line-height:1.5}
+.gtl{font-size:11.5px;color:var(--t3);display:flex;flex-direction:column;gap:3px;line-height:1.5;flex:0 0 auto}
 .gtl-row{display:flex;align-items:baseline;gap:0}
 .gtl-row-items{display:flex;flex-wrap:wrap;gap:0}
 .gtl-item{white-space:normal}
@@ -2176,7 +2176,7 @@ function buildToiletSummary(f) {
       if (major === '共用') {
         // 共用は中分類毎の室数のみ（小分類の有無や数量詳細は概要に出さない）
         Object.keys(catObj).forEach(minor => {
-          majorTotals[major][minor] = (majorTotals[major][minor] || 0) + 1;
+          majorTotals[major][minor] = (majorTotals[major][minor] || 0) + minorCount(catObj[minor]);
         });
       } else {
         // 男子・女子は大便器（内訳：大型・和式）と小便器のみ
