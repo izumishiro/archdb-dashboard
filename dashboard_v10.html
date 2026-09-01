@@ -146,11 +146,11 @@ input{font-family:inherit;color:inherit}
 .sec-ct{font-size:10px;color:var(--t3);margin-left:auto}
 
 /* ── GALLERY ── */
-.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));align-content:start;gap:11px;padding:14px;border-radius:var(--r3);flex:1;min-height:100%}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));align-content:start;gap:11px;padding:14px;border-radius:var(--r3);min-height:200px}
 [data-theme="light"] .gallery{background:#D8D8DC}
-.gcard{background:var(--s0);border:1px solid var(--s2);border-radius:var(--r4);overflow:hidden;box-shadow:var(--sh0);cursor:pointer;transition:box-shadow var(--ease),transform var(--ease),border-color var(--ease);display:flex;flex-direction:column}
+.gcard{background:var(--s0);border:1px solid var(--s2);border-radius:var(--r4);box-shadow:var(--sh0);cursor:pointer;transition:box-shadow var(--ease),transform var(--ease),border-color var(--ease);display:flex;flex-direction:column}
 .gcard:hover{box-shadow:var(--sh2);transform:translateY(-2px);border-color:var(--s3)}
-.gthumb{width:100%;position:relative;height:210px;background:var(--s2);overflow:hidden;border-bottom:1px solid var(--s2);flex:0 0 210px}
+.gthumb{width:100%;position:relative;height:210px;background:var(--s2);overflow:hidden;border-bottom:1px solid var(--s2);flex:0 0 210px;border-radius:calc(var(--r4) - 1px) calc(var(--r4) - 1px) 0 0}
 .gph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:var(--s4)}
 .gph svg{width:22px;height:22px;stroke:currentColor;opacity:.5}
 .gph span{font-size:9px;letter-spacing:.05em;text-transform:uppercase;opacity:.6}
@@ -162,7 +162,7 @@ input{font-family:inherit;color:inherit}
 .gcmp:hover{border-color:var(--primary)}
 .gcmp.on{background:var(--primary);border-color:var(--primary)}
 .gcmp.on svg{opacity:1}
-.gbody{padding:11px 13px;flex:1 0 auto;overflow:visible;display:flex;flex-direction:column;min-height:0}
+.gbody{padding:11px 13px;flex:1 0 auto;display:flex;flex-direction:column}
 .gname{font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:4px;line-height:1.35;overflow-wrap:anywhere;flex:0 0 auto}
 .gmeta{font-size:11px;color:var(--t3);display:flex;align-items:flex-start;gap:5px;margin-bottom:8px;line-height:1.45;overflow-wrap:anywhere;flex:0 0 auto}
 .gmeta svg{width:10px;height:10px;stroke:currentColor;flex-shrink:0;margin-top:3px}
